@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打地鼠遊戲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: radial-gradient(circle at 20% 30%, #222 0%, #000 20%);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #FF9800;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(255, 152, 0, 0.7);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #aaa;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 25px;
+            padding: 15px 25px;
+            background-color: #111;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .score-value {
+            color: #4CAF50;
+        }
+        
+        .time-value {
+            color: #2196F3;
+        }
+        
+        .level-value {
+            color: #FF9800;
+        }
+        
+        .game-board {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background-color: #0a0a0a;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 152, 0, 0.2);
+            border: 2px solid #333;
+            margin-bottom: 25px;
+        }
+        
+        .hole-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+        }
+        
+        .hole {
+            position: relative;
+            background-color: #222;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid #333;
+        }
+        
+        .hole:hover {
+            transform: scale(1.02);
+        }
+        
+        .hole:active {
+            transform: scale(0.98);
+        }
+        
+        .hole-dirt {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30%;
+            background-color: #5D4037;
+            border-radius: 50% 50% 0 0;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .mole {
+            position: absolute;
+            width: 80%;
+            height: 70%;
+            bottom: -100%;
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .mole.active {
+            bottom: 0;
+        }
+        
+        .mole-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .hit-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 215, 0, 0.7);
+            border-radius: 50%;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+        
+        .control-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .control-btn:active {
+            transform: translateY(1px);
+        }
+        
+        #startBtn {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        }
+        
+        #pauseBtn {
+            background: linear-gradient(135deg, #2196F3, #0D47A1);
+        }
+        
+        #restartBtn {
+            background: linear-gradient(135deg, #FF9800, #EF6C00);
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .game-over h2 {
+            color: #f44336;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(244, 67, 54, 0.7);
+        }
+        
+        .game-over p {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .final-score {
+            color: #FFEB3B;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .instructions {
+            background-color: #111;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+        
+        .instructions h3 {
+            color: #FF9800;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .instruction-item {
+            flex: 1;
+            min-width: 200px;
+            background-color: #222;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .instruction-item h4 {
+            color: #4CAF50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .instruction-item p {
+            color: #ccc;
+            line-height: 1.5;
+        }
+        
+        .hammer {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30,10 L70,10 L80,30 L70,50 L30,50 L20,30 Z" fill="%23555"/><rect x="40" y="50" width="20" height="40" fill="%23555"/><rect x="35" y="90" width="30" height="10" fill="%23333"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 200;
+            transform: rotate(-45deg);
+            display: none;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .game-board {
+                height: 400px;
+            }
+            
+            .hole-container {
+                padding: 20px;
+                gap: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-btn {
+                width: 80%;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .info-item {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .info-label {
+                margin-bottom: 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-board {
+                height: 350px;
+            }
+            
+            .hole-container {
+                padding: 15px;
+                gap: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>打地鼠遊戲</h1>
+        <p class="subtitle">擊中地鼠贏取高分！</p>
+    </div>
+    
+    <div class="instructions">
+        <h3>遊戲說明</h3>
+        <div class="instructions-content">
+            <div class="instruction-item">
+                <h4>遊戲目標</h4>
+                <p>在時間限制內擊中盡可能多的地鼠，每擊中一隻地鼠可以獲得積分。</p>
+            </div>
+            <div class="instruction-item">
+                <h4>遊戲規則</h4>
+                <p>地鼠會隨機從洞中出現，點擊地鼠即可擊中。遊戲共有3個關卡，關卡越高地鼠出現越快。</p>
+            </div>
+            <div class="instruction-item">
+                <h4>分數計算</h4>
+                <p>普通地鼠：10分<br>特殊金色地鼠：50分<br>連續擊中會有額外加分！</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">分數</div>
+                <div id="score" class="info-value score-value">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">時間</div>
+                <div id="time" class="info-value time-value">60</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">關卡</div>
+                <div id="level" class="info-value level-value">1</div>
+            </div>
+        </div>
+        
+        <div class="game-board" id="gameBoard">
+            <div class="hole-container" id="holeContainer">
+                <!-- 洞將由JavaScript動態生成 -->
+            </div>
+            
+            <div class="game-over" id="gameOverScreen">
+                <h2>遊戲結束！</h2>
+                <p>你的最終分數</p>
+                <div class="final-score" id="finalScore">0</div>
+                <button class="control-btn" id="playAgainBtn">再玩一次</button>
+            </div>
+        </div>
+        
+        <div class="hammer" id="hammer"></div>
+        
+        <div class="controls">
+            <button class="control-btn" id="startBtn">開始遊戲</button>
+            <button class="control-btn" id="pauseBtn">暫停遊戲</button>
+            <button class="control-btn" id="restartBtn">重新開始</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>HTML5 打地鼠遊戲 | 點擊地鼠贏取高分</p>
+    </div>
+
+    <script>
+        // 遊戲變數
+        const gameBoard = document.getElementById('gameBoard');
+        const holeContainer = document.getElementById('holeContainer');
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('time');
+        const levelElement = document.getElementById('level');
+        const finalScoreElement = document.getElementById('finalScore');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const hammer = document.getElementById('hammer');
+        
+        // 遊戲參數
+        const HOLES_COUNT = 9;
+        const INITIAL_TIME = 60; // 遊戲時間（秒）
+        const LEVEL_SCORES = [0, 100, 250]; // 升級所需分數
+        
+        let holes = [];
+        let moles = [];
+        let score = 0;
+        let timeLeft = INITIAL_TIME;
+        let level = 1;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameTimer;
+        let moleTimer;
+        let consecutiveHits = 0;
+        let lastHitTime = 0;
+        
+        // 初始化遊戲
+        function initGame() {
+            // 清空遊戲區域
+            holeContainer.innerHTML = '';
+            holes = [];
+            moles = [];
+            
+            // 創建洞和地鼠
+            for (let i = 0; i < HOLES_COUNT; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'hole';
+                hole.dataset.index = i;
+                
+                const holeDirt = document.createElement('div');
+                holeDirt.className = 'hole-dirt';
+                
+                const mole = document.createElement('div');
+                mole.className = 'mole';
+                mole.dataset.index = i;
+                
+                // 隨機選擇地鼠類型（85%普通，15%金色）
+                const isGolden = Math.random() < 0.15;
+                mole.dataset.type = isGolden ? 'golden' : 'normal';
+                
+                const moleImg = document.createElement('div');
+                moleImg.className = 'mole-img';
+                // 使用SVG創建地鼠圖形
+                moleImg.innerHTML = isGolden 
+                    ? createGoldenMoleSVG() 
+                    : createNormalMoleSVG();
+                
+                const hitEffect = document.createElement('div');
+                hitEffect.className = 'hit-effect';
+                
+                mole.appendChild(moleImg);
+                mole.appendChild(hitEffect);
+                hole.appendChild(holeDirt);
+                hole.appendChild(mole);
+                holeContainer.appendChild(hole);
+                
+                // 添加到數組中
+                holes.push(hole);
+                moles.push({
+                    element: mole,
+                    active: false,
+                    timer: null,
+                    type: isGolden ? 'golden' : 'normal'
+                });
+                
+                // 添加點擊事件
+                hole.addEventListener('click', () => hitMole(i));
+            }
+            
+            // 重置遊戲狀態
+            score = 0;
+            timeLeft = INITIAL_TIME;
+            level = 1;
+            consecutiveHits = 0;
+            lastHitTime = 0;
+            
+            // 更新顯示
+            updateDisplay();
+            
+            // 隱藏遊戲結束畫面
+            gameOverScreen.style.display = 'none';
+            
+            // 顯示錘子
+            hammer.style.display = 'block';
+        }
+        
+        // 創建普通地鼠SVG
+        function createNormalMoleSVG() {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <!-- 身體 -->
+                    <ellipse cx="50" cy="65" rx="35" ry="30" fill="#795548"/>
+                    
+                    <!-- 頭部 -->
+                    <ellipse cx="50" cy="35" rx="25" ry="20" fill="#8D6E63"/>
+                    
+                    <!-- 鼻子 -->
+                    <ellipse cx="50" cy="30" rx="8" ry="5" fill="#5D4037"/>
+                    
+                    <!-- 眼睛 -->
+                    <circle cx="40" cy="25" r="3" fill="#000"/>
+                    <circle cx="60" cy="25" r="3" fill="#000"/>
+                    
+                    <!-- 耳朵 -->
+                    <ellipse cx="30" cy="20" rx="6" ry="8" fill="#8D6E63"/>
+                    <ellipse cx="70" cy="20" rx="6" ry="8" fill="#8D6E63"/>
+                    
+                    <!-- 嘴巴 -->
+                    <path d="M45,40 Q50,45 55,40" stroke="#5D4037" stroke-width="2" fill="none"/>
+                </svg>
+            `;
+        }
+        
+        // 創建金色地鼠SVG
+        function createGoldenMoleSVG() {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <!-- 身體 -->
+                    <ellipse cx="50" cy="65" rx="35" ry="30" fill="#FFD700"/>
+                    
+                    <!-- 頭部 -->
+                    <ellipse cx="50" cy="35" rx="25" ry="20" fill="#FFC400"/>
+                    
+                    <!-- 鼻子 -->
+                    <ellipse cx="50" cy="30" rx="8" ry="5" fill="#B8860B"/>
+                    
+                    <!-- 眼睛 -->
+                    <circle cx="40" cy="25" r="3" fill="#000"/>
+                    <circle cx="60" cy="25" r="3" fill="#000"/>
+                    
+                    <!-- 耳朵 -->
+                    <ellipse cx="30" cy="20" rx="6" ry="8" fill="#FFC400"/>
+                    <ellipse cx="70" cy="20" rx="6" ry="8" fill="#FFC400"/>
+                    
+                    <!-- 嘴巴 -->
+                    <path d="M45,40 Q50,45 55,40" stroke="#B8860B" stroke-width="2" fill="none"/>
+                    
+                    <!-- 皇冠 -->
+                    <path d="M35,15 L40,5 L45,10 L50,5 L55,10 L60,5 L65,15 Z" fill="#FFD700"/>
+                    <circle cx="40" cy="5" r="2" fill="#FFF"/>
+                    <circle cx="50" cy="5" r="2" fill="#FFF"/>
+                    <circle cx="60" cy="5" r="2" fill="#FFF"/>
+                </svg>
+            `;
+        }
+        
+        // 更新顯示
+        function updateDisplay() {
+            scoreElement.textContent = score;
+            timeElement.textContent = timeLeft;
+            levelElement.textContent = level;
+        }
+        
+        // 開始遊戲
+        function startGame() {
+            if (gameRunning) return;
+            
+            gameRunning = true;
+            gamePaused = false;
+            startBtn.textContent = "遊戲進行中";
+            startBtn.disabled = true;
+            
+            // 開始計時器
+            gameTimer = setInterval(() => {
+                if (!gamePaused) {
+                    timeLeft--;
+                    timeElement.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        gameOver();
+                    }
+                }
+            }, 1000);
+            
+            // 開始地鼠出現循環
+            startMoleCycle();
+        }
+        
+        // 開始地鼠出現循環
+        function startMoleCycle() {
+            if (!gameRunning || gamePaused) return;
+            
+            // 清除之前的計時器
+            if (moleTimer) clearTimeout(moleTimer);
+            
+            // 計算地鼠出現間隔（根據關卡）
+            const moleInterval = Math.max(500, 1200 - (level * 200));
+            
+            // 隨機讓一個地鼠出現
+            popRandomMole();
+            
+            // 設置下一個地鼠出現
+            moleTimer = setTimeout(startMoleCycle, moleInterval);
+        }
+        
+        // 隨機讓一個地鼠出現
+        function popRandomMole() {
+            if (!gameRunning || gamePaused) return;
+            
+            // 找到當前沒有出現的地鼠
+            const inactiveMoles = moles.filter(mole => !mole.active);
+            if (inactiveMoles.length === 0) return;
+            
+            // 隨機選擇一個地鼠
+            const randomIndex = Math.floor(Math.random() * inactiveMoles.length);
+            const mole = inactiveMoles[randomIndex];
+            
+            // 讓地鼠出現
+            mole.active = true;
+            mole.element.classList.add('active');
+            
+            // 設置地鼠消失的時間（根據關卡）
+            const hideDelay = Math.max(800, 1500 - (level * 150));
+            
+            // 設置定時器讓地鼠消失
+            mole.timer = setTimeout(() => {
+                if (mole.active) {
+                    hideMole(mole);
+                }
+            }, hideDelay);
+        }
+        
+        // 隱藏地鼠
+        function hideMole(mole) {
+            mole.active = false;
+            mole.element.classList.remove('active');
+            
+            if (mole.timer) {
+                clearTimeout(mole.timer);
+                mole.timer = null;
+            }
+        }
+        
+        // 擊中地鼠
+        function hitMole(index) {
+            if (!gameRunning || gamePaused) return;
+            
+            const mole = moles[index];
+            if (!mole.active) return;
+            
+            // 顯示錘子動畫
+            showHammerAnimation(index);
+            
+            // 計算分數
+            let points = mole.type === 'golden' ? 50 : 10;
+            
+            // 連續擊中獎勵
+            const currentTime = Date.now();
+            if (currentTime - lastHitTime < 1000) {
+                consecutiveHits++;
+                if (consecutiveHits >= 3) {
+                    points *= 2; // 連續擊中3次，分數加倍
+                }
+            } else {
+                consecutiveHits = 1;
+            }
+            lastHitTime = currentTime;
+            
+            // 增加分數
+            score += points;
+            
+            // 檢查是否升級
+            checkLevelUp();
+            
+            // 更新顯示
+            updateDisplay();
+            
+            // 顯示擊中效果
+            const hitEffect = mole.element.querySelector('.hit-effect');
+            hitEffect.style.opacity = '1';
+            hitEffect.style.animation = 'none';
+            
+            setTimeout(() => {
+                hitEffect.style.opacity = '0';
+                hitEffect.style.animation = 'fadeOut 0.5s';
+            }, 10);
+            
+            // 隱藏地鼠
+            hideMole(mole);
+            
+            // 播放點擊聲音效果
+            playHitSound();
+        }
+        
+        // 顯示錘子動畫
+        function showHammerAnimation(index) {
+            const hole = holes[index];
+            const rect = hole.getBoundingClientRect();
+            const boardRect = gameBoard.getBoundingClientRect();
+            
+            // 設置錘子位置
+            hammer.style.left = `${rect.left - boardRect.left + rect.width / 2}px`;
+            hammer.style.top = `${rect.top - boardRect.top + rect.height / 2}px`;
+            hammer.style.display = 'block';
+            
+            // 錘子動畫
+            hammer.style.transform = 'rotate(-45deg) scale(1.2)';
+            hammer.style.transition = 'transform 0.1s';
+            
+            setTimeout(() => {
+                hammer.style.transform = 'rotate(-30deg) scale(1)';
+            }, 100);
+            
+            setTimeout(() => {
+                hammer.style.transform = 'rotate(-45deg) scale(1)';
+            }, 200);
+        }
+        
+        // 檢查是否升級
+        function checkLevelUp() {
+            if (level < 3 && score >= LEVEL_SCORES[level]) {
+                level++;
+                levelElement.textContent = level;
+                
+                // 顯示升級訊息
+                showLevelUpMessage();
+            }
+        }
+        
+        // 顯示升級訊息
+        function showLevelUpMessage() {
+            const message = document.createElement('div');
+            message.style.position = 'absolute';
+            message.style.top = '50%';
+            message.style.left = '50%';
+            message.style.transform = 'translate(-50%, -50%)';
+            message.style.color = '#FF9800';
+            message.style.fontSize = '3rem';
+            message.style.fontWeight = 'bold';
+            message.style.zIndex = '50';
+            message.style.textShadow = '0 0 10px rgba(255, 152, 0, 0.8)';
+            message.textContent = `關卡 ${level}!`;
+            
+            gameBoard.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.transition = 'opacity 0.5s';
+                message.style.opacity = '0';
+                
+                setTimeout(() => {
+                    if (gameBoard.contains(message)) {
+                        gameBoard.removeChild(message);
+                    }
+                }, 500);
+            }, 1000);
+        }
+        
+        // 播放擊中聲音
+        function playHitSound() {
+            // 創建音頻上下文
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        // 暫停/繼續遊戲
+        function togglePause() {
+            if (!gameRunning) return;
+            
+            gamePaused = !gamePaused;
+            pauseBtn.textContent = gamePaused ? "繼續遊戲" : "暫停遊戲";
+            
+            if (gamePaused) {
+                // 暫停所有地鼠
+                moles.forEach(mole => {
+                    if (mole.timer) {
+                        clearTimeout(mole.timer);
+                    }
+                });
+            } else {
+                // 繼續遊戲
+                startMoleCycle();
+            }
+        }
+        
+        // 重新開始遊戲
+        function restartGame() {
+            clearInterval(gameTimer);
+            if (moleTimer) clearTimeout(moleTimer);
+            
+            gameRunning = false;
+            gamePaused = false;
+            startBtn.textContent = "開始遊戲";
+            startBtn.disabled = false;
+            pauseBtn.textContent = "暫停遊戲";
+            
+            initGame();
+        }
+        
+        // 遊戲結束
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameTimer);
+            if (moleTimer) clearTimeout(moleTimer);
+            
+            // 隱藏所有地鼠
+            moles.forEach(mole => hideMole(mole));
+            
+            // 隱藏錘子
+            hammer.style.display = 'none';
+            
+            // 顯示遊戲結束畫面
+            finalScoreElement.textContent = score;
+            gameOverScreen.style.display = 'flex';
+            startBtn.textContent = "開始遊戲";
+            startBtn.disabled = false;
+        }
+        
+        // 添加錘子跟隨滑鼠
+        document.addEventListener('mousemove', (e) => {
+            if (!gameRunning || gamePaused) return;
+            
+            const boardRect = gameBoard.getBoundingClientRect();
+            
+            // 檢查滑鼠是否在遊戲區域內
+            if (
+                e.clientX >= boardRect.left && 
+                e.clientX <= boardRect.right &&
+                e.clientY >= boardRect.top && 
+                e.clientY <= boardRect.bottom
+            ) {
+                hammer.style.left = `${e.clientX - boardRect.left - 40}px`;
+                hammer.style.top = `${e.clientY - boardRect.top - 40}px`;
+            }
+        });
+        
+        // 按鈕事件監聽
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', togglePause);
+        restartBtn.addEventListener('click', restartGame);
+        playAgainBtn.addEventListener('click', () => {
+            restartGame();
+            startGame();
+        });
+        
+        // 初始化遊戲
+        initGame();
+    </script>
+</body>
+</html>
