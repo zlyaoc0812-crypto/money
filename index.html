@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的遊戲館 | 精選小遊戲集合</title>
+    <title>我的遊戲館 | 多類別小遊戲集合</title>
     <style>
         :root {
-            --color-bg: #1a1a2e;
-            --color-card-bg: #2d2d44;
-            --color-card-hover: #3d3d5c;
-            --color-accent: #6c63ff;
-            --border-radius: 12px;
-            --transition-speed: 0.25s;
-            --shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            --color-bg: #0f172a;
+            --color-card: #1e293b;
+            --color-card-hover: #334155;
+            --color-accent-1: #3b82f6;
+            --color-accent-2: #10b981;
+            --color-accent-3: #f59e0b;
+            --color-accent-4: #ef4444;
+            --border-radius: 16px;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * {
@@ -22,9 +25,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--color-bg);
-            color: #fff;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
             min-height: 100vh;
             padding: 2rem 1rem;
             line-height: 1.6;
@@ -33,137 +36,358 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 0 1rem;
         }
 
         header {
-            margin-bottom: 3rem;
             text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         h1 {
             font-size: 2.8rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, #ff6b6b, #6c63ff);
+            background: linear-gradient(90deg, #60a5fa, #34d399, #fbbf24);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
+            margin-bottom: 0.5rem;
         }
 
         .subtitle {
+            color: #94a3b8;
             font-size: 1.1rem;
-            color: #aaa;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto 2rem;
         }
+
+        /* 分類標籤 */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            background: var(--color-card);
+            border: 2px solid transparent;
+            color: #cbd5e1;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--color-card-hover);
+            border-color: var(--color-accent-1);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* 遊戲分類區塊 */
+        .category-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid;
+            width: fit-content;
+        }
+
+        .category-1 .category-title { border-color: var(--color-accent-1); }
+        .category-2 .category-title { border-color: var(--color-accent-2); }
+        .category-3 .category-title { border-color: var(--color-accent-3); }
+        .category-4 .category-title { border-color: var(--color-accent-4); }
 
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.5rem;
-            justify-items: center;
-            margin-top: 2rem;
+            gap: 1.8rem;
         }
 
         .game-card {
+            background: var(--color-card);
+            border-radius: var(--border-radius);
+            padding: 2rem 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: var(--color-card-bg);
-            width: 100%;
-            max-width: 200px;
-            padding: 2rem 1.5rem;
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            color: inherit;
-            transition: all var(--transition-speed) ease;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .game-card:hover,
-        .game-card:focus {
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-accent-1), var(--color-accent-2));
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             background: var(--color-card-hover);
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-            outline: 2px solid var(--color-accent);
-            outline-offset: 2px;
         }
 
         .game-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+            font-size: 3.5rem;
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
         }
 
         .game-title {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.2rem;
             text-align: center;
+            margin-bottom: 0.5rem;
         }
+
+        .game-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* 難度標示 */
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .easy { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .hard { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 
         footer {
-            margin-top: 4rem;
-            color: #777;
-            font-size: 0.9rem;
             text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+            font-size: 0.9rem;
         }
 
+        /* 響應式設計 */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.2rem;
-            }
-
-            .games-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 1rem;
-            }
-
-            .game-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .game-icon {
-                font-size: 2.5rem;
-            }
+            h1 { font-size: 2.2rem; }
+            .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .category-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
-            .games-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
+            .games-grid { grid-template-columns: repeat(2, 1fr); }
+            .logo { font-size: 2.8rem; }
+            h1 { font-size: 1.9rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎮 我的遊戲館</h1>
-            <p class="subtitle">精選小遊戲合集 | 輕鬆娛樂，隨時暢玩</p>
+            <div class="logo">🎮</div>
+            <h1>我的遊戲館</h1>
+            <p class="subtitle">超過 20 款精選小遊戲 | 多種類別，每日更新</p>
+            
+            <!-- 分類篩選按鈕 -->
+            <div class="categories">
+                <button class="category-btn active" data-category="all">全部遊戲</button>
+                <button class="category-btn" data-category="action">動作冒險</button>
+                <button class="category-btn" data-category="puzzle">益智解謎</button>
+                <button class="category-btn" data-category="arcade">街機經典</button>
+                <button class="category-btn" data-category="casual">休閒放鬆</button>
+            </div>
         </header>
 
         <main>
-            <div class="games-grid">
-                <a href="game1.html" class="game-card" aria-label="進入猜數字遊戲">
-                    <div class="game-icon">🎯</div>
-                    <div class="game-title">猜數字</div>
-                </a>
-                <a href="game2.html" class="game-card" aria-label="進入包剪揼遊戲">
-                    <div class="game-icon">✊</div>
-                    <div class="game-title">包剪揼</div>
-                </a>
-                <!-- 可在此繼續添加更多遊戲 -->
-            </div>
+            <!-- 動作冒險類 -->
+            <section class="category-section category-1" id="action">
+                <h2 class="category-title">⚔️ 動作冒險</h2>
+                <div class="games-grid">
+                    <a href="game1.html" class="game-card">
+                        <div class="game-icon">🐹</div>
+                        <div class="game-title">打地鼠</div>
+                        <div class="game-desc">快速擊打出現的地鼠</div>
+                        <span class="difficulty easy">簡單</span>
+                    </a>
+                    <a href="game2.html" class="game-card">
+                        <div class="game-icon">👾</div>
+                        <div class="game-title">俄羅斯方塊</div>
+                        <div class="game-desc">經典方塊消除遊戲</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                    <a href="game3.html" class="game-card">
+                        <div class="game-icon">🤡</div>
+                        <div class="game-title">躲避障礙物</div>
+                        <div class="game-desc">靈活閃避各種障礙</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                    <a href="game4.html" class="game-card">
+                        <div class="game-icon">🚀</div>
+                        <div class="game-title">太空射擊</div>
+                        <div class="game-desc">駕駛飛船消滅敵機</div>
+                        <span class="difficulty hard">困難</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 益智解謎類 -->
+            <section class="category-section category-2" id="puzzle">
+                <h2 class="category-title">🧩 益智解謎</h2>
+                <div class="games-grid">
+                    <a href="game5.html" class="game-card">
+                        <div class="game-icon">🔢</div>
+                        <div class="game-title">數獨挑戰</div>
+                        <div class="game-desc">經典數字邏輯遊戲</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                    <a href="game6.html" class="game-card">
+                        <div class="game-icon">🧠</div>
+                        <div class="game-title">記憶翻牌</div>
+                        <div class="game-desc">考驗記憶力的配對遊戲</div>
+                        <span class="difficulty easy">簡單</span>
+                    </a>
+                    <a href="game7.html" class="game-card">
+                        <div class="game-icon">🧱</div>
+                        <div class="game-title">方塊拼圖</div>
+                        <div class="game-desc">移動方塊完成拼圖</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 街機經典類 -->
+            <section class="category-section category-3" id="arcade">
+                <h2 class="category-title">🎪 街機經典</h2>
+                <div class="games-grid">
+                    <a href="game8.html" class="game-card">
+                        <div class="game-icon">🍒</div>
+                        <div class="game-title">吃豆人</div>
+                        <div class="game-desc">經典迷宮追逐遊戲</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                    <a href="game9.html" class="game-card">
+                        <div class="game-icon">🐍</div>
+                        <div class="game-title">貪食蛇</div>
+                        <div class="game-desc">控制蛇吃到食物</div>
+                        <span class="difficulty easy">簡單</span>
+                    </a>
+                    <a href="game10.html" class="game-card">
+                        <div class="game-icon">🕹️</div>
+                        <div class="game-title">打磚塊</div>
+                        <div class="game-desc">用球拍擊碎所有磚塊</div>
+                        <span class="difficulty medium">中等</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 休閒放鬆類 -->
+            <section class="category-section category-4" id="casual">
+                <h2 class="category-title">🌱 休閒放鬆</h2>
+                <div class="games-grid">
+                    <a href="game11.html" class="game-card">
+                        <div class="game-icon">🌸</div>
+                        <div class="game-title">泡泡龍</div>
+                        <div class="game-desc">射擊彩色泡泡消除</div>
+                        <span class="difficulty easy">簡單</span>
+                    </a>
+                    <a href="game12.html" class="game-card">
+                        <div class="game-icon">🃏</div>
+                        <div class="game-title">接龍</div>
+                        <div class="game-desc">經典紙牌排序遊戲</div>
+                        <span class="difficulty easy">簡單</span>
+                    </a>
+                </div>
+            </section>
         </main>
 
         <footer>
-            <p>© 2023 我的遊戲館 | 持續更新中</p>
+            <p>© 2023 我的遊戲館 | 遊戲持續增加中 | 建議使用 Chrome 或 Edge 瀏覽器</p>
         </footer>
     </div>
+
+    <script>
+        // 分類篩選功能
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 移除所有按鈕的 active 類別
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 添加當前按鈕的 active 類別
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                
+                // 顯示/隱藏遊戲分類
+                document.querySelectorAll('.category-section').forEach(section => {
+                    if (category === 'all' || section.id === category) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 添加滾動動畫
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // 為每個遊戲卡片添加動畫
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
 </body>
 </html>
