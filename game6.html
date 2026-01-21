@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記憶翻牌</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(135deg, #8e2de2, #4a00e0);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 2.5rem; color: #ffd700; margin-bottom: 10px; }
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+        }
+        .info-box { text-align: center; }
+        .info-box h3 { color: #00ff88; margin-bottom: 10px; }
+        .info-box p { font-size: 2rem; font-weight: bold; color: #ffd700; }
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .card {
+            aspect-ratio: 1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card.matched { opacity: 0.5; cursor: default; }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        .card-front {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            transform: rotateY(180deg);
+        }
+        .card-back {
+            background: linear-gradient(45deg, #556270, #ff7b00);
+            border: 3px solid #ffd700;
+        }
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+        button:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.5); }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .back-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        @media (max-width: 650px) {
+            .memory-board { grid-template-columns: repeat(3, 1fr); }
+            .game-info { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 記憶翻牌</h1>
+        <p>記住卡片位置，找出所有配對！</p>
+    </div>
+    
+    <div class="game-container">
+        <div class="game-info">
+            <div class="info-box">
+                <h3>時間</h3>
+                <p id="timer">00:00</p>
+            </div>
+            <div class="info-box">
+                <h3>移動次數</h3>
+                <p id="moves">0</p>
+            </div>
+            <div class="info-box">
+                <h3>配對數</h3>
+                <p id="matches">0</p>
+            </div>
+        </div>
+        
+        <div class="memory-board" id="memoryBoard"></div>
+        
+        <div class="controls">
+            <button id="startBtn">開始遊戲</button>
+            <button id="resetBtn">重新開始</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>遊戲說明：</h3>
+            <p>點擊翻開卡片，記住它們的位置</p>
+            <p>找到所有相同的卡片配對</p>
+            <p>用最少的移動次數和時間完成遊戲</p>
+        </div>
+        
+        <a href="index.html" class="back-btn">← 返回遊戲館</a>
+    </div>
+
+    <script>
+        const memoryBoard = document.getElementById('memoryBoard');
+        const timerElement = document.getElementById('timer');
+        const movesElement = document.getElementById('moves');
+        const matchesElement = document.getElementById('matches');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        const emojis = ['🎮', '🎯', '🎲', '🎨', '🎪', '🎭', '🎸', '🎹'];
+        let cards = [];
+        let flippedCards = [];
+        let matches = 0;
+        let moves = 0;
+        let gameActive = false;
+        let startTime = 0;
+        let timerInterval;
+        let canFlip = true;
+        
+        function initGame() {
+            memoryBoard.innerHTML = '';
+            cards = [];
+            flippedCards = [];
+            matches = 0;
+            moves = 0;
+            gameActive = false;
+            canFlip = true;
+            
+            movesElement.textContent = moves;
+            matchesElement.textContent = matches;
+            timerElement.textContent = '00:00';
+            
+            clearInterval(timerInterval);
+            
+            // 創建卡片配對
+            let cardValues = [...emojis, ...emojis];
+            
+            // 洗牌
+            cardValues = cardValues.sort(() => Math.random() - 0.5);
+            
+            // 創建卡片元素
+            cardValues.forEach((value, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.value = value;
+                
+                const cardInner = document.createElement('div');
+                cardInner.className = 'card-inner';
+                
+                const cardFront = document.createElement('div');
+                cardFront.className = 'card-front';
+                cardFront.textContent = value;
+                
+                const cardBack = document.createElement('div');
+                cardBack.className = 'card-back';
+                cardBack.textContent = '?';
+                
+                cardInner.appendChild(cardFront);
+                cardInner.appendChild(cardBack);
+                card.appendChild(cardInner);
+                
+                card.addEventListener('click', () => flipCard(card));
+                memoryBoard.appendChild(card);
+                
+                cards.push({
+                    element: card,
+                    value: value,
+                    flipped: false,
+                    matched: false
+                });
+            });
+        }
+        
+        function flipCard(card) {
+            if (!gameActive || !canFlip || flippedCards.length >= 2) return;
+            
+            const cardIndex = parseInt(card.dataset.index);
+            const cardData = cards[cardIndex];
+            
+            if (cardData.flipped || cardData.matched) return;
+            
+            // 翻開卡片
+            card.classList.add('flipped');
+            cardData.flipped = true;
+            flippedCards.push(cardData);
+            
+            // 檢查配對
+            if (flippedCards.length === 2) {
+                moves++;
+                movesElement.textContent = moves;
+                canFlip = false;
+                
+                if (flippedCards[0].value === flippedCards[1].value) {
+                    // 配對成功
+                    setTimeout(() => {
+                        flippedCards[0].matched = true;
+                        flippedCards[1].matched = true;
+                        
+                        flippedCards[0].element.classList.add('matched');
+                        flippedCards[1].element.classList.add('matched');
+                        
+                        flippedCards = [];
+                        canFlip = true;
+                        matches++;
+                        matchesElement.textContent = matches;
+                        
+                        // 檢查遊戲是否完成
+                        if (matches === emojis.length) {
+                            endGame();
+                        }
+                    }, 500);
+                } else {
+                    // 配對失敗
+                    setTimeout(() => {
+                        flippedCards[0].element.classList.remove('flipped');
+                        flippedCards[1].element.classList.remove('flipped');
+                        
+                        flippedCards[0].flipped = false;
+                        flippedCards[1].flipped = false;
+                        
+                        flippedCards = [];
+                        canFlip = true;
+                    }, 1000);
+                }
+            }
+        }
+        
+        function startGame() {
+            if (gameActive) return;
+            
+            initGame();
+            gameActive = true;
+            startTime = Date.now();
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const seconds = (elapsed % 60).toString().padStart(2, '0');
+                timerElement.textContent = `${minutes}:${seconds}`;
+            }, 1000);
+        }
+        
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            setTimeout(() => {
+                alert(`🎉 恭喜！你完成了記憶翻牌！\n\n時間：${minutes}分${seconds}秒\n移動次數：${moves}\n\n點擊"重新開始"再玩一次！`);
+            }, 500);
+        }
+        
+        startBtn.addEventListener('click', startGame);
+        resetBtn.addEventListener('click', initGame);
+        
+        // 初始化遊戲
+        initGame();
+    </script>
+</body>
+</html>

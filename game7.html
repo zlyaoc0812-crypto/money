@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方塊拼圖</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui;
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 2.5rem; color: #00ff9d; margin-bottom: 10px; }
+        .game-container {
+            display: flex;
+            gap: 40px;
+            max-width: 1000px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .puzzle-container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            border: 3px solid #00ff9d;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        .puzzle-board {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 2px;
+            background: #333;
+        }
+        .puzzle-tile {
+            background: linear-gradient(45deg, #4a00e0, #8e2de2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        .puzzle-tile:hover { filter: brightness(1.2); }
+        .puzzle-tile.empty { background: transparent; border: none; cursor: default; }
+        .puzzle-tile.correct { background: linear-gradient(45deg, #00ff9d, #00b894); }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            min-width: 300px;
+        }
+        .info-box {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .info-box h3 { color: #00ff9d; margin-bottom: 10px; }
+        .info-box p { font-size: 1.8rem; font-weight: bold; color: #ffd700; }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .start-btn { background: #00b894; color: white; }
+        .shuffle-btn { background: #0984e3; color: white; }
+        .hint-btn { background: #a29bfe; color: white; }
+        .solve-btn { background: #e17055; color: white; }
+        button:hover { transform: translateY(-3px); }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            max-width: 800px;
+            text-align: center;
+        }
+        .back-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        @media (max-width: 768px) {
+            .game-container { flex-direction: column; align-items: center; }
+            .puzzle-container { width: 90vw; height: 90vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧩 方塊拼圖</h1>
+        <p>移動方塊完成拼圖</p>
+    </div>
+    
+    <div class="game-container">
+        <div class="puzzle-container">
+            <div class="puzzle-board" id="puzzleBoard"></div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-box">
+                <h3>移動次數</h3>
+                <p id="moves">0</p>
+            </div>
+            <div class="info-box">
+                <h3>時間</h3>
+                <p id="timer">00:00</p>
+            </div>
+            <div class="info-box">
+                <h3>最佳紀錄</h3>
+                <p id="bestTime">--:--</p>
+            </div>
+            
+            <div class="controls">
+                <button class="start-btn" id="startBtn">開始遊戲</button>
+                <button class="shuffle-btn" id="shuffleBtn">打亂拼圖</button>
+                <button class="hint-btn" id="hintBtn">提示</button>
+                <button class="solve-btn" id="solveBtn">解答</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h3>遊戲說明：</h3>
+        <p>點擊空白方塊旁邊的方塊來移動它</p>
+        <p>將所有方塊按順序排列（1-8）</p>
+        <p>用最少的移動次數和時間完成拼圖</p>
+    </div>
+    
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script>
+        const puzzleBoard = document.getElementById('puzzleBoard');
+        const movesElement = document.getElementById('moves');
+        const timerElement = document.getElementById('timer');
+        const bestTimeElement = document.getElementById('bestTime');
+        const startBtn = document.getElementById('startBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const solveBtn = document.getElementById('solveBtn');
+        
+        const solvedState = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 0]  // 0 表示空白
+        ];
+        
+        let currentState = JSON.parse(JSON.stringify(solvedState));
+        let emptyPosition = { row: 2, col: 2 };
+        let moves = 0;
+        let gameActive = false;
+        let startTime = 0;
+        let timerInterval;
+        let bestTime = localStorage.getItem('puzzleBestTime') || null;
+        
+        if (bestTime) {
+            bestTimeElement.textContent = bestTime;
+        }
+        
+        function initBoard() {
+            puzzleBoard.innerHTML = '';
+            
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'puzzle-tile';
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+                    
+                    const value = currentState[row][col];
+                    if (value === 0) {
+                        tile.classList.add('empty');
+                        tile.textContent = '';
+                    } else {
+                        tile.textContent = value;
+                        
+                        // 檢查是否在正確位置
+                        if (solvedState[row][col] === value) {
+                            tile.classList.add('correct');
+                        }
+                    }
+                    
+                    tile.addEventListener('click', () => moveTile(row, col));
+                    puzzleBoard.appendChild(tile);
+                }
+            }
+        }
+        
+        function moveTile(row, col) {
+            if (!gameActive || currentState[row][col] === 0) return;
+            
+            // 檢查是否與空白方塊相鄰
+            const rowDiff = Math.abs(row - emptyPosition.row);
+            const colDiff = Math.abs(col - emptyPosition.col);
+            
+            if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                // 交換位置
+                currentState[emptyPosition.row][emptyPosition.col] = currentState[row][col];
+                currentState[row][col] = 0;
+                
+                // 更新空白位置
+                emptyPosition = { row, col };
+                
+                // 更新移動次數
+                moves++;
+                movesElement.textContent = moves;
+                
+                // 更新界面
+                initBoard();
+                
+                // 檢查是否完成
+                if (checkSolved()) {
+                    endGame();
+                }
+            }
+        }
+        
+        function shufflePuzzle() {
+            if (!gameActive) return;
+            
+            // 執行隨機移動來打亂拼圖
+            for (let i = 0; i < 100; i++) {
+                const possibleMoves = [];
+                
+                // 找到所有可以移動的方塊
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        if (currentState[row][col] !== 0) {
+                            const rowDiff = Math.abs(row - emptyPosition.row);
+                            const colDiff = Math.abs(col - emptyPosition.col);
+                            
+                            if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                                possibleMoves.push({ row, col });
+                            }
+                        }
+                    }
+                }
+                
+                // 隨機選擇一個方塊移動
+                if (possibleMoves.length > 0) {
+                    const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                    currentState[emptyPosition.row][emptyPosition.col] = currentState[randomMove.row][randomMove.col];
+                    currentState[randomMove.row][randomMove.col] = 0;
+                    emptyPosition = { row: randomMove.row, col: randomMove.col };
+                }
+            }
+            
+            moves = 0;
+            movesElement.textContent = moves;
+            initBoard();
+        }
+        
+        function checkSolved() {
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (currentState[row][col] !== solvedState[row][col]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        function startGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            moves = 0;
+            movesElement.textContent = moves;
+            
+            // 重置為初始狀態
+            currentState = JSON.parse(JSON.stringify(solvedState));
+            emptyPosition = { row: 2, col: 2 };
+            
+            // 打亂拼圖
+            shufflePuzzle();
+            
+            // 開始計時
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function updateTimer() {
+            if (!gameActive) return;
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            timerElement.textContent = `${minutes}:${seconds}`;
+        }
+        
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // 更新最佳紀錄
+            if (!bestTime || elapsed < parseTime(bestTime)) {
+                bestTime = timeString;
+                bestTimeElement.textContent = bestTime;
+                localStorage.setItem('puzzleBestTime', bestTime);
+                alert(`🎉 新紀錄！\n\n時間：${timeString}\n移動次數：${moves}\n\n恭喜你創造了新的最佳紀錄！`);
+            } else {
+                alert(`🎉 完成拼圖！\n\n時間：${timeString}\n移動次數：${moves}\n\n最佳紀錄：${bestTime}`);
+            }
+        }
+        
+        function parseTime(timeStr) {
+            const [minutes, seconds] = timeStr.split(':').map(Number);
+            return minutes * 60 + seconds;
+        }
+        
+        function showHint() {
+            if (!gameActive) return;
+            
+            // 找到第一個錯誤位置
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (currentState[row][col] !== solvedState[row][col] && currentState[row][col] !== 0) {
+                        const tile = document.querySelector(`.puzzle-tile[data-row="${row}"][data-col="${col}"]`);
+                        tile.style.boxShadow = '0 0 20px yellow';
+                        setTimeout(() => {
+                            if (gameActive) tile.style.boxShadow = '';
+                        }, 2000);
+                        return;
+                    }
+                }
+            }
+        }
+        
+        function solvePuzzle() {
+            if (!gameActive || !confirm('確定要顯示解答嗎？')) return;
+            
+            currentState = JSON.parse(JSON.stringify(solvedState));
+            emptyPosition = { row: 2, col: 2 };
+            initBoard();
+            endGame();
+        }
+        
+        startBtn.addEventListener('click', startGame);
+        shuffleBtn.addEventListener('click', shufflePuzzle);
+        hintBtn.addEventListener('click', showHint);
+        solveBtn.addEventListener('click', solvePuzzle);
+        
+        // 初始化界面
+        initBoard();
+    </script>
+</body>
+</html>

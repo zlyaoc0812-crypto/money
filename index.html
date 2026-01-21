@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的遊戲館 | 多類別小遊戲集合</title>
+    <title>Chloe的娛樂天地</title>
     <style>
         :root {
             --color-bg: #0f172a;
-            --color-card: #1e293b;
-            --color-card-hover: #334155;
+            --color-card: rgba(30, 41, 59, 0.9);
+            --color-card-hover: rgba(51, 65, 85, 0.95);
             --color-accent-1: #3b82f6;
             --color-accent-2: #10b981;
             --color-accent-3: #f59e0b;
@@ -26,33 +26,297 @@
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
             color: #f8fafc;
             min-height: 100vh;
-            padding: 2rem 1rem;
             line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
         }
 
+        /* 科技感動態背景 */
+        .tech-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                linear-gradient(45deg, #0a0f1e 25%, transparent 25%) -50px 0,
+                linear-gradient(-45deg, #0a0f1e 25%, transparent 25%) -50px 0,
+                linear-gradient(45deg, transparent 75%, #0a0f1e 75%),
+                linear-gradient(-45deg, transparent 75%, #0a0f1e 75%);
+            background-size: 100px 100px;
+            background-color: #0d1424;
+            overflow: hidden;
+        }
+
+        /* 網格線 */
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        /* 流動數據線 */
+        .data-stream {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent, 
+                rgba(59, 130, 246, 0.8),
+                rgba(16, 185, 129, 0.8),
+                rgba(245, 158, 11, 0.8),
+                transparent);
+            filter: blur(1px);
+            animation: streamFlow 15s linear infinite;
+            opacity: 0.7;
+        }
+
+        .data-stream:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+            height: 80%;
+        }
+
+        .data-stream:nth-child(2) {
+            left: 30%;
+            animation-delay: 3s;
+            height: 60%;
+        }
+
+        .data-stream:nth-child(3) {
+            left: 50%;
+            animation-delay: 6s;
+            height: 90%;
+        }
+
+        .data-stream:nth-child(4) {
+            left: 70%;
+            animation-delay: 9s;
+            height: 70%;
+        }
+
+        .data-stream:nth-child(5) {
+            left: 90%;
+            animation-delay: 12s;
+            height: 85%;
+        }
+
+        /* 浮動幾何圖形 */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 5px;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .shape.triangle {
+            width: 40px;
+            height: 40px;
+            border-color: #3b82f6;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            animation-delay: 0s;
+            top: 20%;
+            left: 15%;
+        }
+
+        .shape.circle {
+            width: 60px;
+            height: 60px;
+            border-color: #10b981;
+            border-radius: 50%;
+            animation-delay: 5s;
+            top: 60%;
+            left: 85%;
+        }
+
+        .shape.square {
+            width: 50px;
+            height: 50px;
+            border-color: #f59e0b;
+            animation-delay: 10s;
+            top: 80%;
+            left: 10%;
+        }
+
+        .shape.hexagon {
+            width: 45px;
+            height: 45px;
+            border-color: #ef4444;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            animation-delay: 15s;
+            top: 30%;
+            left: 90%;
+        }
+
+        /* 粒子效果 */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(59, 130, 246, 0.5);
+            animation: particleMove 15s infinite linear;
+        }
+
+        /* 發光點 */
+        .glow-points {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glow-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            box-shadow: 
+                0 0 20px 3px rgba(59, 130, 246, 0.8),
+                0 0 40px 6px rgba(59, 130, 246, 0.4);
+            animation: glowPulse 3s infinite alternate;
+        }
+
+        .glow-point:nth-child(1) {
+            top: 15%;
+            left: 25%;
+            animation-delay: 0s;
+        }
+
+        .glow-point:nth-child(2) {
+            top: 45%;
+            left: 65%;
+            animation-delay: 1s;
+            background: #10b981;
+            box-shadow: 
+                0 0 20px 3px rgba(16, 185, 129, 0.8),
+                0 0 40px 6px rgba(16, 185, 129, 0.4);
+        }
+
+        .glow-point:nth-child(3) {
+            top: 75%;
+            left: 40%;
+            animation-delay: 2s;
+            background: #f59e0b;
+            box-shadow: 
+                0 0 20px 3px rgba(245, 158, 11, 0.8),
+                0 0 40px 6px rgba(245, 158, 11, 0.4);
+        }
+
+        /* 動畫關鍵幀 */
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        @keyframes streamFlow {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translate(0, 0) rotate(0deg); 
+            }
+            25% { 
+                transform: translate(50px, 50px) rotate(90deg); 
+            }
+            50% { 
+                transform: translate(0, 100px) rotate(180deg); 
+            }
+            75% { 
+                transform: translate(-50px, 50px) rotate(270deg); 
+            }
+        }
+
+        @keyframes particleMove {
+            0% { 
+                transform: translate(0, 0); 
+                opacity: 0;
+            }
+            10% { 
+                opacity: 1;
+            }
+            90% { 
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(var(--tx, 100px), var(--ty, 100px)); 
+                opacity: 0;
+            }
+        }
+
+        @keyframes glowPulse {
+            0% { 
+                transform: scale(1); 
+                opacity: 0.7;
+            }
+            100% { 
+                transform: scale(1.3); 
+                opacity: 1;
+            }
+        }
+
+        /* 主內容區域 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         header {
             text-align: center;
             margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .logo {
             font-size: 3.5rem;
             margin-bottom: 1rem;
             animation: float 3s ease-in-out infinite;
+            text-shadow: 
+                0 0 30px rgba(59, 130, 246, 0.8),
+                0 0 60px rgba(59, 130, 246, 0.4);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-10px) rotate(5deg); }
+            75% { transform: translateY(10px) rotate(-5deg); }
         }
 
         h1 {
@@ -61,6 +325,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .subtitle {
@@ -82,26 +347,36 @@
         .category-btn {
             padding: 0.7rem 1.5rem;
             border-radius: 50px;
-            background: var(--color-card);
+            background: rgba(30, 41, 59, 0.8);
             border: 2px solid transparent;
             color: #cbd5e1;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            backdrop-filter: blur(5px);
         }
 
         .category-btn:hover,
         .category-btn.active {
-            background: var(--color-card-hover);
-            border-color: var(--color-accent-1);
+            background: linear-gradient(45deg, var(--color-accent-1), var(--color-accent-2));
+            border-color: transparent;
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
 
         /* 遊戲分類區塊 */
         .category-section {
             margin-bottom: 4rem;
             scroll-margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .category-title {
@@ -113,12 +388,25 @@
             padding-bottom: 0.5rem;
             border-bottom: 3px solid;
             width: fit-content;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .category-1 .category-title { border-color: var(--color-accent-1); }
-        .category-2 .category-title { border-color: var(--color-accent-2); }
-        .category-3 .category-title { border-color: var(--color-accent-3); }
-        .category-4 .category-title { border-color: var(--color-accent-4); }
+        .category-1 .category-title { 
+            border-color: var(--color-accent-1); 
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        .category-2 .category-title { 
+            border-color: var(--color-accent-2); 
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .category-3 .category-title { 
+            border-color: var(--color-accent-3); 
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+        .category-4 .category-title { 
+            border-color: var(--color-accent-4); 
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
 
         .games-grid {
             display: grid;
@@ -141,6 +429,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(5px);
         }
 
         .game-card::before {
@@ -151,18 +440,47 @@
             right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--color-accent-1), var(--color-accent-2));
+            opacity: 0.7;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .game-card:hover::after {
+            left: 100%;
         }
 
         .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(59, 130, 246, 0.2);
             background: var(--color-card-hover);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         .game-icon {
             font-size: 3.5rem;
             margin-bottom: 1.2rem;
             filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .game-title {
@@ -170,6 +488,8 @@
             font-size: 1.2rem;
             text-align: center;
             margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
         }
 
         .game-desc {
@@ -177,6 +497,8 @@
             color: #94a3b8;
             text-align: center;
             line-height: 1.4;
+            position: relative;
+            z-index: 2;
         }
 
         /* 難度標示 */
@@ -188,19 +510,36 @@
             font-weight: 700;
             margin-top: 0.8rem;
             background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
         }
 
-        .easy { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .hard { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .easy { 
+            background: rgba(34, 197, 94, 0.2); 
+            color: #4ade80;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+        .medium { 
+            background: rgba(245, 158, 11, 0.2); 
+            color: #fbbf24;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+        .hard { 
+            background: rgba(239, 68, 68, 0.2); 
+            color: #f87171;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
 
         footer {
             text-align: center;
             margin-top: 4rem;
-            padding-top: 2rem;
+            padding: 2rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: #64748b;
             font-size: 0.9rem;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
         }
 
         /* 響應式設計 */
@@ -208,16 +547,46 @@
             h1 { font-size: 2.2rem; }
             .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
             .category-title { font-size: 1.5rem; }
+            .category-section { padding: 1.5rem; }
+            header { padding: 1.5rem; }
         }
 
         @media (max-width: 480px) {
             .games-grid { grid-template-columns: repeat(2, 1fr); }
             .logo { font-size: 2.8rem; }
             h1 { font-size: 1.9rem; }
+            .categories { flex-direction: column; align-items: center; }
+            .category-btn { width: 80%; }
         }
     </style>
 </head>
 <body>
+    <!-- 科技感動態背景 -->
+    <div class="tech-background">
+        <div class="grid-lines"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        <div class="data-stream"></div>
+        
+        <div class="floating-shapes">
+            <div class="shape triangle"></div>
+            <div class="shape circle"></div>
+            <div class="shape square"></div>
+            <div class="shape hexagon"></div>
+        </div>
+        
+        <div class="particles" id="particles"></div>
+        
+        <div class="glow-points">
+            <div class="glow-point"></div>
+            <div class="glow-point"></div>
+            <div class="glow-point"></div>
+        </div>
+    </div>
+
+    <!-- 主內容區域（保持原樣不變） -->
     <div class="container">
         <header>
             <div class="logo">🎮</div>
@@ -315,25 +684,7 @@
                     </a>
                 </div>
             </section>
-
-            <!-- 休閒放鬆類 -->
-            <section class="category-section category-4" id="casual">
-                <h2 class="category-title">🌱 休閒放鬆</h2>
-                <div class="games-grid">
-                    <a href="game11.html" class="game-card">
-                        <div class="game-icon">🌸</div>
-                        <div class="game-title">泡泡龍</div>
-                        <div class="game-desc">射擊彩色泡泡消除</div>
-                        <span class="difficulty easy">簡單</span>
-                    </a>
-                    <a href="game12.html" class="game-card">
-                        <div class="game-icon">🃏</div>
-                        <div class="game-title">接龍</div>
-                        <div class="game-desc">經典紙牌排序遊戲</div>
-                        <span class="difficulty easy">簡單</span>
-                    </a>
-                </div>
-            </section>
+           
         </main>
 
         <footer>
@@ -342,6 +693,44 @@
     </div>
 
     <script>
+        // 動態生成粒子
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // 隨機位置
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                
+                // 隨機移動距離
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                
+                // 隨機大小和顏色
+                const size = Math.random() * 3 + 1;
+                const hue = Math.random() * 360;
+                
+                // 設置樣式
+                particle.style.cssText = `
+                    left: ${left}%;
+                    top: ${top}%;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: hsla(${hue}, 100%, 70%, 0.8);
+                    --tx: ${tx}px;
+                    --ty: ${ty}px;
+                    animation-delay: ${Math.random() * 15}s;
+                    animation-duration: ${Math.random() * 10 + 10}s;
+                `;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
         // 分類篩選功能
         document.querySelectorAll('.category-btn').forEach(button => {
             button.addEventListener('click', function() {
@@ -387,6 +776,26 @@
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(card);
+        });
+
+        // 頁面加載時創建粒子
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // 添加滑鼠互動效果
+            document.addEventListener('mousemove', (e) => {
+                const particles = document.querySelectorAll('.particle');
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                particles.forEach((particle, i) => {
+                    const speed = i * 0.02;
+                    const xOffset = (x - 0.5) * 50;
+                    const yOffset = (y - 0.5) * 50;
+                    
+                    particle.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+                });
+            });
         });
     </script>
 </body>

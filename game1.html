@@ -1,418 +1,951 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打地鼠遊戲</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            min-height: 100vh;
         }
-        h1 { color: #FF9800; font-size: 2.5rem; margin: 10px 0; }
-        .subtitle { color: #aaa; margin-bottom: 20px; }
-        
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            margin: 20px 0;
-            padding: 15px;
-            background: #111;
-            border-radius: 10px;
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
-        .info-item { text-align: center; }
-        .info-label { color: #aaa; font-size: 0.9rem; }
-        .info-value { font-size: 1.8rem; font-weight: bold; }
-        .score-value { color: #4CAF50; }
-        .time-value { color: #2196F3; }
-        
-        .game-board {
-            width: 500px;
-            height: 400px;
-            background: #0a0a0a;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 20px;
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.7);
+            animation: glow 2s infinite alternate;
         }
-        .hole-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 15px;
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 107, 107, 0.7); }
+            to { text-shadow: 0 0 20px rgba(255, 107, 107, 1); }
+        }
+
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
             padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             width: 100%;
-            height: 100%;
+            max-width: 900px;
+            border: 3px solid #4ecdc4;
         }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box h3 {
+            color: #4ecdc4;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #score { color: #ffd166; }
+        #time { color: #06d6a0; }
+        #combo { color: #ff6b6b; }
+        #multiplier { color: #a29bfe; }
+        #lives { color: #4d96ff; }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
         .hole {
-            background: #222;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #8b4513, #654321);
             border-radius: 50%;
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            border: 2px solid #333;
+            box-shadow: 
+                inset 0 10px 20px rgba(0, 0, 0, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 3px solid #5d4037;
+            transition: transform 0.2s;
         }
-        .hole-dirt {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 30%;
-            background: #5D4037;
-            border-radius: 50% 50% 0 0;
+
+        .hole:hover {
+            transform: scale(1.05);
         }
-        .mole, .obstacle {
+
+        .hole::after {
+            content: '';
             position: absolute;
-            width: 70%;
-            height: 60%;
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            bottom: 10%;
+            background: #5d4037;
+            border-radius: 50%;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .mole {
+            position: absolute;
+            width: 90%;
+            height: 90%;
             bottom: -100%;
-            transition: bottom 0.3s;
-            left: 15%;
+            left: 5%;
+            border-radius: 45% 45% 35% 35%;
+            transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            z-index: 2;
         }
-        .mole.active, .obstacle.active { bottom: 0; }
-        
+
+        .mole.normal {
+            background: linear-gradient(135deg, #8b5a2b, #d2691e);
+        }
+
+        .mole.golden {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+        }
+
+        .mole.bomb {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+        }
+
+        .mole.active {
+            bottom: 0%;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-10px); }
+        }
+
+        .mole::before {
+            position: absolute;
+            top: -35%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            z-index: 3;
+        }
+
+        .mole.normal::before { content: '🐹'; }
+        .mole.golden::before { content: '🐭'; }
+        .mole.bomb::before { content: '💣'; }
+
+        .mole::after {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: 25%;
+            width: 50%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            bottom: -100%;
+            left: 10%;
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            border-radius: 10px;
+            transition: bottom 0.4s;
+            cursor: not-allowed;
+            z-index: 1;
+        }
+
+        .obstacle.active {
+            bottom: 0%;
+        }
+
+        .obstacle::before {
+            content: '🪨';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+        }
+
         .controls {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
-        }
-        .control-btn {
-            padding: 12px 25px;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            min-width: 120px;
-        }
-        #startBtn { background: #4CAF50; }
-        #pauseBtn { background: #2196F3; }
-        #restartBtn { background: #FF9800; }
-        
-        .game-over {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            display: none;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
-        .hammer {
-            position: absolute;
-            width: 60px; height: 60px;
-            pointer-events: none;
-            display: none;
+
+        button {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #startBtn {
+            background: linear-gradient(45deg, #06d6a0, #00b894);
+            color: white;
+        }
+
+        #pauseBtn {
+            background: linear-gradient(45deg, #0984e3, #00cec9);
+            color: white;
+        }
+
+        #resetBtn {
+            background: linear-gradient(45deg, #ffd166, #fdcb6e);
+            color: #333;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .difficulty {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .difficulty-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover, .difficulty-btn.active {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: #4ecdc4;
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 900px;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .instructions h3 {
+            color: #4d96ff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions h3::before {
+            content: '🎯';
+            font-size: 1.5rem;
+        }
+
+        .game-rules {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rule-icon {
+            font-size: 1.8rem;
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        .combo-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transform: scale(0);
+            transition: transform 0.3s;
             z-index: 100;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
         }
-        
-        .hit-effect, .penalty-effect {
+
+        .combo-indicator.show {
+            transform: scale(1);
+        }
+
+        .hit-effect {
             position: absolute;
-            width: 100%; height: 100%;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
-            opacity: 0;
+            pointer-events: none;
+            transform: scale(0);
+            animation: hitEffect 0.5s ease-out;
+            z-index: 10;
         }
-        .hit-effect { background: rgba(255,215,0,0.5); }
-        .penalty-effect { background: rgba(255,0,0,0.5); }
+
+        @keyframes hitEffect {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .back-btn {
+            margin-top: 25px;
+            padding: 12px 35px;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(45deg, #5b4fdc, #8e7cf7);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .game-board { grid-template-columns: repeat(3, 1fr); }
+            .game-info { grid-template-columns: repeat(3, 1fr); }
+            .game-rules { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; align-items: center; }
+            button { width: 100%; max-width: 300px; }
+        }
+
+        @media (max-width: 480px) {
+            .game-board { grid-template-columns: repeat(2, 1fr); }
+            .game-info { grid-template-columns: repeat(2, 1fr); }
+            h1 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>打地鼠遊戲</h1>
-    <p class="subtitle">擊中地鼠得分，避開障礙物！</p>
-    
-    <div class="game-info">
-        <div class="info-item">
-            <div class="info-label">分數</div>
-            <div id="score" class="info-value score-value">0</div>
+    <div class="combo-indicator" id="comboIndicator">COMBO x1!</div>
+
+    <div class="header">
+        <h1>🐹 瘋狂打地鼠 🎯</h1>
+        <p>擊打地鼠，避開炸彈，挑戰你的反應極限！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="difficulty">
+            <div class="difficulty-btn active" data-difficulty="easy">簡單</div>
+            <div class="difficulty-btn" data-difficulty="medium">中等</div>
+            <div class="difficulty-btn" data-difficulty="hard">困難</div>
+            <div class="difficulty-btn" data-difficulty="insane">瘋狂</div>
         </div>
-        <div class="info-item">
-            <div class="info-label">時間</div>
-            <div id="time" class="info-value time-value">60</div>
+
+        <div class="game-info">
+            <div class="info-box">
+                <h3>分數</h3>
+                <p id="score">0</p>
+            </div>
+            <div class="info-box">
+                <h3>時間</h3>
+                <p id="time">60</p>
+            </div>
+            <div class="info-box">
+                <h3>連擊數</h3>
+                <p id="combo">0</p>
+            </div>
+            <div class="info-box">
+                <h3>倍率</h3>
+                <p id="multiplier">x1.0</p>
+            </div>
+            <div class="info-box">
+                <h3>生命</h3>
+                <p id="lives">3</p>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <!-- 地鼠洞將由JavaScript生成 -->
+        </div>
+
+        <div class="controls">
+            <button id="startBtn">🎮 開始遊戲</button>
+            <button id="pauseBtn">⏸️ 暫停遊戲</button>
+            <button id="resetBtn">🔄 重新開始</button>
         </div>
     </div>
-    
-    <div class="game-board" id="gameBoard">
-        <div class="hole-container" id="holeContainer"></div>
-        <div class="game-over" id="gameOverScreen">
-            <h2>遊戲結束！</h2>
-            <div class="final-score" id="finalScore">0</div>
-            <button class="control-btn" id="playAgainBtn">再玩一次</button>
+
+    <div class="instructions">
+        <h3>遊戲說明</h3>
+        <div class="game-rules">
+            <div class="rule">
+                <div class="rule-icon">🐹</div>
+                <div class="rule-text">普通地鼠：+10分，維持連擊</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🐭</div>
+                <div class="rule-text">黃金地鼠：+50分，連擊+2</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">💣</div>
+                <div class="rule-text">炸彈地鼠：-1生命，重置連擊</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🪨</div>
+                <div class="rule-text">障礙物：無法點擊，持續10秒</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🔥</div>
+                <div class="rule-text">連續擊中：增加倍率（最高x3.0）</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">⏱️</div>
+                <div class="rule-text">時間限制：60秒，倒數結束遊戲</div>
+            </div>
         </div>
     </div>
-    
-    <div class="controls">
-        <button class="control-btn" id="startBtn">開始遊戲</button>
-        <button class="control-btn" id="pauseBtn">暫停遊戲</button>
-        <button class="control-btn" id="restartBtn">重新開始</button>
-    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
 
     <script>
-        // 遊戲變數
-        const holes = [];
-        const gameObjects = [];
-        let score = 0;
-        let timeLeft = 60;
-        let gameRunning = false;
-        let gamePaused = false;
-        let gameTimer;
-        let objectTimer;
-        let consecutiveHits = 0;
-        let lastHitTime = 0;
-        const OBSTACLE_PROBABILITY = 0.25; // 25%機率出現障礙物
-
-        // DOM元素
+        const gameBoard = document.getElementById('gameBoard');
         const scoreElement = document.getElementById('score');
         const timeElement = document.getElementById('time');
-        const holeContainer = document.getElementById('holeContainer');
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const finalScoreElement = document.getElementById('finalScore');
+        const comboElement = document.getElementById('combo');
+        const multiplierElement = document.getElementById('multiplier');
+        const livesElement = document.getElementById('lives');
+        const comboIndicator = document.getElementById('comboIndicator');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
-        // 初始化遊戲
-        function initGame() {
-            holeContainer.innerHTML = '';
-            holes.length = 0;
-            gameObjects.length = 0;
+        // 遊戲配置
+        const CONFIG = {
+            easy: {
+                moleCount: 10,
+                bombChance: 0.05,
+                goldenChance: 0.1,
+                obstacleChance: 0.05,
+                moleSpeed: 1000,
+                hideTime: { min: 1500, max: 2500 }
+            },
+            medium: {
+                moleCount: 15,
+                bombChance: 0.1,
+                goldenChance: 0.15,
+                obstacleChance: 0.1,
+                moleSpeed: 800,
+                hideTime: { min: 1000, max: 2000 }
+            },
+            hard: {
+                moleCount: 20,
+                bombChance: 0.15,
+                goldenChance: 0.2,
+                obstacleChance: 0.15,
+                moleSpeed: 600,
+                hideTime: { min: 800, max: 1500 }
+            },
+            insane: {
+                moleCount: 25,
+                bombChance: 0.2,
+                goldenChance: 0.25,
+                obstacleChance: 0.2,
+                moleSpeed: 400,
+                hideTime: { min: 500, max: 1000 }
+            }
+        };
+
+        let score = 0;
+        let timeLeft = 60;
+        let combo = 0;
+        let multiplier = 1.0;
+        let lives = 3;
+        let highScore = localStorage.getItem('whackHighScore') || 0;
+        let gameActive = false;
+        let gamePaused = false;
+        let currentDifficulty = 'medium';
+        let gameTimer = null;
+        let moleTimer = null;
+        let activeElements = new Map(); // 儲存活動元素及其計時器
+
+        // 初始化遊戲板（5x5網格）
+        function initGameBoard() {
+            gameBoard.innerHTML = '';
+            const holeCount = 25; // 5x5網格
             
-            // 創建9個洞
-            for (let i = 0; i < 9; i++) {
+            for (let i = 0; i < holeCount; i++) {
                 const hole = document.createElement('div');
                 hole.className = 'hole';
                 hole.dataset.index = i;
                 
-                const dirt = document.createElement('div');
-                dirt.className = 'hole-dirt';
-                hole.appendChild(dirt);
+                // 添加障礙物
+                const obstacle = document.createElement('div');
+                obstacle.className = 'obstacle';
+                obstacle.dataset.index = i;
                 
-                hole.addEventListener('click', () => hitObject(i));
-                holeContainer.appendChild(hole);
-                holes.push(hole);
+                hole.appendChild(obstacle);
+                gameBoard.appendChild(hole);
+            }
+        }
+
+        // 設置難度
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            difficultyBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.difficulty === difficulty);
+            });
+        }
+
+        // 獲取隨機洞
+        function getRandomHole() {
+            const holes = document.querySelectorAll('.hole');
+            const availableHoles = Array.from(holes).filter(hole => {
+                const hasActiveMole = hole.querySelector('.mole.active');
+                const hasActiveObstacle = hole.querySelector('.obstacle.active');
+                return !hasActiveMole && !hasActiveObstacle;
+            });
+            
+            if (availableHoles.length === 0) return null;
+            return availableHoles[Math.floor(Math.random() * availableHoles.length)];
+        }
+
+        // 創建地鼠或障礙物
+        function createGameElement() {
+            if (!gameActive || gamePaused) return;
+            
+            const hole = getRandomHole();
+            if (!hole) return;
+            
+            const config = CONFIG[currentDifficulty];
+            const rand = Math.random();
+            
+            let element;
+            if (rand < config.obstacleChance) {
+                // 創建障礙物
+                const obstacle = document.createElement('div');
+                obstacle.className = 'obstacle active';
+                obstacle.dataset.type = 'obstacle';
+                hole.appendChild(obstacle);
+                element = obstacle;
+            } else {
+                // 創建地鼠
+                const mole = document.createElement('div');
+                mole.className = 'mole';
+                mole.dataset.type = 'mole';
+                
+                if (rand < config.bombChance + config.obstacleChance) {
+                    mole.classList.add('bomb');
+                    mole.dataset.subtype = 'bomb';
+                } else if (rand < config.bombChance + config.obstacleChance + config.goldenChance) {
+                    mole.classList.add('golden');
+                    mole.dataset.subtype = 'golden';
+                } else {
+                    mole.classList.add('normal');
+                    mole.dataset.subtype = 'normal';
+                }
+                
+                mole.classList.add('active');
+                hole.appendChild(mole);
+                element = mole;
             }
             
-            resetGame();
+            // 添加點擊事件
+            if (element.dataset.type === 'mole') {
+                element.addEventListener('click', hitElement);
+            }
+            
+            // 設置消失時間
+            const hideTime = config.hideTime.min + 
+                           Math.random() * (config.hideTime.max - config.hideTime.min);
+            
+            const elementId = Date.now() + Math.random();
+            activeElements.set(elementId, {
+                element: element,
+                timer: setTimeout(() => hideElement(elementId), hideTime)
+            });
         }
 
-        // 重置遊戲狀態
-        function resetGame() {
-            score = 0;
-            timeLeft = 60;
-            consecutiveHits = 0;
-            gameRunning = false;
-            gamePaused = false;
-            updateDisplay();
-            gameOverScreen.style.display = 'none';
+        // 隱藏元素
+        function hideElement(elementId) {
+            const data = activeElements.get(elementId);
+            if (!data) return;
+            
+            const element = data.element;
+            if (element && element.parentNode) {
+                element.classList.remove('active');
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }, 400);
+            }
+            
+            activeElements.delete(elementId);
         }
 
-        // 更新顯示
-        function updateDisplay() {
+        // 點擊元素
+        function hitElement(e) {
+            if (!gameActive || gamePaused) return;
+            
+            const element = e.target;
+            const type = element.dataset.subtype || element.dataset.type;
+            
+            // 創建擊中效果
+            createHitEffect(e.clientX, e.clientY);
+            
+            // 根據類型處理
+            switch(type) {
+                case 'normal':
+                    handleNormalMole(element);
+                    break;
+                case 'golden':
+                    handleGoldenMole(element);
+                    break;
+                case 'bomb':
+                    handleBombMole(element);
+                    break;
+            }
+            
+            // 移除元素
+            removeElement(element);
+        }
+
+        // 處理普通地鼠
+        function handleNormalMole(element) {
+            score += Math.floor(10 * multiplier);
+            combo++;
+            updateMultiplier();
+            showComboEffect();
+            updateScore();
+        }
+
+        // 處理黃金地鼠
+        function handleGoldenMole(element) {
+            score += Math.floor(50 * multiplier);
+            combo += 2;
+            updateMultiplier();
+            showComboEffect();
+            updateScore();
+        }
+
+        // 處理炸彈地鼠
+        function handleBombMole(element) {
+            lives--;
+            combo = 0;
+            multiplier = 1.0;
+            updateScore();
+            
+            // 震動效果
+            gameBoard.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                gameBoard.style.animation = '';
+            }, 500);
+            
+            // 生命為0時結束遊戲
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+
+        // 創建擊中效果
+        function createHitEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            effect.style.left = (x - 25) + 'px';
+            effect.style.top = (y - 25) + 'px';
+            document.body.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 500);
+        }
+
+        // 移除元素
+        function removeElement(element) {
+            element.classList.remove('active');
+            // 找到對應的activeElements條目並清除
+            for (const [id, data] of activeElements.entries()) {
+                if (data.element === element) {
+                    clearTimeout(data.timer);
+                    activeElements.delete(id);
+                    break;
+                }
+            }
+            
+            setTimeout(() => {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+            }, 300);
+        }
+
+        // 更新倍率
+        function updateMultiplier() {
+            if (combo >= 30) {
+                multiplier = 3.0;
+            } else if (combo >= 20) {
+                multiplier = 2.5;
+            } else if (combo >= 15) {
+                multiplier = 2.0;
+            } else if (combo >= 10) {
+                multiplier = 1.5;
+            } else if (combo >= 5) {
+                multiplier = 1.2;
+            } else {
+                multiplier = 1.0;
+            }
+            
+            comboElement.textContent = combo;
+            multiplierElement.textContent = `x${multiplier.toFixed(1)}`;
+        }
+
+        // 顯示連擊效果
+        function showComboEffect() {
+            if (combo >= 5) {
+                comboIndicator.textContent = `COMBO x${combo}! 🔥`;
+                comboIndicator.classList.add('show');
+                
+                setTimeout(() => {
+                    comboIndicator.classList.remove('show');
+                }, 1500);
+            }
+        }
+
+        // 更新分數顯示
+        function updateScore() {
             scoreElement.textContent = score;
-            timeElement.textContent = timeLeft;
+            livesElement.textContent = lives;
         }
 
         // 開始遊戲
         function startGame() {
-            if (gameRunning) return;
-            gameRunning = true;
+            if (gameActive) return;
             
+            gameActive = true;
+            gamePaused = false;
+            score = 0;
+            timeLeft = 60;
+            combo = 0;
+            multiplier = 1.0;
+            lives = 3;
+            activeElements.clear();
+            
+            updateScore();
+            updateMultiplier();
+            
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            pauseBtn.textContent = '⏸️ 暫停遊戲';
+            resetBtn.disabled = false;
+            
+            // 清除遊戲板
+            initGameBoard();
+            
+            // 啟動遊戲計時器
             gameTimer = setInterval(() => {
                 if (!gamePaused) {
                     timeLeft--;
-                    updateDisplay();
-                    if (timeLeft <= 0) gameOver();
+                    timeElement.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
                 }
             }, 1000);
             
-            startObjectCycle();
-        }
-
-        // 開始物件出現循環
-        function startObjectCycle() {
-            if (!gameRunning || gamePaused) return;
-            
-            if (objectTimer) clearTimeout(objectTimer);
-            const interval = Math.max(500, 1200 - (Math.floor(score/100) * 100));
-            
-            popRandomObject();
-            objectTimer = setTimeout(startObjectCycle, interval);
-        }
-
-        // 隨機出現物件
-        function popRandomObject() {
-            if (!gameRunning || gamePaused) return;
-            
-            const holeIndex = Math.floor(Math.random() * 9);
-            const hasObject = gameObjects.some(obj => 
-                obj.active && obj.element.parentElement === holes[holeIndex]
-            );
-            if (hasObject) return;
-            
-            // 決定生成地鼠還是障礙物
-            let object;
-            if (Math.random() < OBSTACLE_PROBABILITY) {
-                object = createObstacle(holeIndex);
-            } else {
-                object = createMole(holeIndex, Math.random() < 0.15);
-            }
-            
-            object.active = true;
-            object.element.classList.add('active');
-            gameObjects.push(object);
-            
-            // 設定消失時間
-            object.timer = setTimeout(() => hideObject(object), 1000);
-        }
-
-        // 創建地鼠
-        function createMole(index, isGolden) {
-            const hole = holes[index];
-            const mole = document.createElement('div');
-            mole.className = 'mole';
-            mole.innerHTML = `
-                <svg viewBox="0 0 100 100">
-                    <ellipse cx="50" cy="65" rx="35" ry="30" fill="${isGolden ? '#FFD700' : '#795548'}"/>
-                    <ellipse cx="50" cy="35" rx="25" ry="20" fill="${isGolden ? '#FFC400' : '#8D6E63'}"/>
-                    <ellipse cx="50" cy="30" rx="8" ry="5" fill="#5D4037"/>
-                    <circle cx="40" cy="25" r="3" fill="#000"/>
-                    <circle cx="60" cy="25" r="3" fill="#000"/>
-                    ${isGolden ? '<path d="M35,15 L40,5 L45,10 L50,5 L55,10 L60,5 L65,15 Z" fill="#FFD700"/>' : ''}
-                </svg>
-                <div class="hit-effect"></div>
-            `;
-            hole.appendChild(mole);
-            
-            return {
-                element: mole,
-                active: false,
-                timer: null,
-                type: isGolden ? 'golden' : 'normal',
-                points: isGolden ? 50 : 10
-            };
-        }
-
-        // 創建障礙物
-        function createObstacle(index) {
-            const hole = holes[index];
-            const obstacle = document.createElement('div');
-            obstacle.className = 'obstacle';
-            obstacle.innerHTML = `
-                <svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="30" fill="#f44336"/>
-                    <circle cx="50" cy="50" r="25" fill="#ff7961"/>
-                    <rect x="47" y="20" width="6" height="15" fill="#5d4037"/>
-                    <path d="M50,20 Q45,10 40,5" stroke="#ffcc80" stroke-width="3" fill="none"/>
-                </svg>
-                <div class="penalty-effect"></div>
-            `;
-            hole.appendChild(obstacle);
-            
-            return {
-                element: obstacle,
-                active: false,
-                timer: null,
-                type: 'obstacle',
-                points: -20
-            };
-        }
-
-        // 隱藏物件
-        function hideObject(obj) {
-            obj.active = false;
-            obj.element.classList.remove('active');
-            if (obj.timer) clearTimeout(obj.timer);
-            const index = gameObjects.indexOf(obj);
-            if (index > -1) gameObjects.splice(index, 1);
-            setTimeout(() => obj.element.remove(), 300);
-        }
-
-        // 點擊物件
-        function hitObject(index) {
-            if (!gameRunning || gamePaused) return;
-            
-            const obj = gameObjects.find(o => 
-                o.active && o.element.parentElement === holes[index]
-            );
-            if (!obj) return;
-            
-            // 計算分數
-            let points = obj.points;
-            const now = Date.now();
-            
-            if (obj.type !== 'obstacle') {
-                // 地鼠：連續擊中獎勵
-                if (now - lastHitTime < 1000) {
-                    consecutiveHits++;
-                    if (consecutiveHits >= 3) points *= 2;
-                } else {
-                    consecutiveHits = 1;
+            // 啟動地鼠生成計時器
+            const config = CONFIG[currentDifficulty];
+            moleTimer = setInterval(() => {
+                if (!gamePaused) {
+                    createGameElement();
                 }
-                lastHitTime = now;
-                
-                // 顯示擊中效果
-                const effect = obj.element.querySelector('.hit-effect');
-                effect.style.opacity = '1';
-                setTimeout(() => effect.style.opacity = '0', 300);
-            } else {
-                // 障礙物：扣分
-                consecutiveHits = 0;
-                const effect = obj.element.querySelector('.penalty-effect');
-                effect.style.opacity = '1';
-                setTimeout(() => effect.style.opacity = '0', 300);
-            }
-            
-            score += points;
-            if (score < 0) score = 0;
-            updateDisplay();
-            hideObject(obj);
+            }, config.moleSpeed);
         }
 
         // 暫停/繼續遊戲
         function togglePause() {
-            if (!gameRunning) return;
+            if (!gameActive) return;
+            
             gamePaused = !gamePaused;
-            pauseBtn.textContent = gamePaused ? "繼續遊戲" : "暫停遊戲";
-            if (!gamePaused) startObjectCycle();
+            
+            if (gamePaused) {
+                pauseBtn.textContent = '▶️ 繼續遊戲';
+                // 暫停所有活動元素的計時器
+                for (const data of activeElements.values()) {
+                    clearTimeout(data.timer);
+                }
+            } else {
+                pauseBtn.textContent = '⏸️ 暫停遊戲';
+                // 恢復所有活動元素的計時器
+                const currentTime = Date.now();
+                for (const data of activeElements.values()) {
+                    const element = data.element;
+                    if (element.classList.contains('active')) {
+                        const hideTime = 1000; // 1秒後隱藏
+                        data.timer = setTimeout(() => hideElement(data.element), hideTime);
+                    }
+                }
+            }
         }
 
-        // 遊戲結束
-        function gameOver() {
-            gameRunning = false;
-            clearInterval(gameTimer);
-            if (objectTimer) clearTimeout(objectTimer);
+        // 結束遊戲
+        function endGame() {
+            gameActive = false;
+            gamePaused = false;
             
-            gameObjects.forEach(obj => hideObject(obj));
-            finalScoreElement.textContent = score;
-            gameOverScreen.style.display = 'flex';
+            // 清除所有計時器
+            clearInterval(gameTimer);
+            clearInterval(moleTimer);
+            
+            // 清除所有活動元素
+            for (const data of activeElements.values()) {
+                clearTimeout(data.timer);
+                if (data.element && data.element.parentNode) {
+                    data.element.parentNode.removeChild(data.element);
+                }
+            }
+            activeElements.clear();
+            
+            // 更新最高分
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('whackHighScore', highScore);
+            }
+            
+            // 顯示結果
+            setTimeout(() => {
+                const resultMessage = `
+                    🎮 遊戲結束！\n
+                    🏆 最終分數: ${score}\n
+                    ${score > highScore ? '🎉 新紀錄！' : `最高分: ${highScore}`}\n
+                    🔥 最大連擊: ${combo}\n
+                    ⭐ 最高倍率: x${multiplier.toFixed(1)}
+                `;
+                alert(resultMessage);
+            }, 500);
+            
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 重新開始';
+            pauseBtn.disabled = true;
+            resetBtn.disabled = false;
         }
 
         // 重新開始遊戲
-        function restartGame() {
-            clearInterval(gameTimer);
-            if (objectTimer) clearTimeout(objectTimer);
-            gameObjects.forEach(obj => hideObject(obj));
-            resetGame();
+        function resetGame() {
+            endGame();
+            score = 0;
+            timeLeft = 60;
+            combo = 0;
+            multiplier = 1.0;
+            lives = 3;
+            
+            updateScore();
+            updateMultiplier();
+            timeElement.textContent = timeLeft;
+            
+            initGameBoard();
         }
 
-        // 事件監聽
-        document.getElementById('startBtn').addEventListener('click', startGame);
-        document.getElementById('pauseBtn').addEventListener('click', togglePause);
-        document.getElementById('restartBtn').addEventListener('click', restartGame);
-        document.getElementById('playAgainBtn').addEventListener('click', () => {
-            restartGame();
-            startGame();
+        // 事件監聽器
+        startBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', togglePause);
+        resetBtn.addEventListener('click', resetGame);
+
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!gameActive) {
+                    setDifficulty(btn.dataset.difficulty);
+                }
+            });
         });
 
         // 初始化
-        initGame();
+        initGameBoard();
+        setDifficulty('medium');
+        pauseBtn.disabled = true;
+        resetBtn.disabled = true;
+
+        // 添加震動動畫
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
