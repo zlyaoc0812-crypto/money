@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>記憶翻牌</title>
-    <style>
+  <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Comic Sans MS', cursive;
@@ -117,9 +117,13 @@
             .memory-board { grid-template-columns: repeat(3, 1fr); }
             .game-info { flex-direction: column; gap: 15px; }
         }
-    </style>
+  </style>
+  <link rel="stylesheet" href="./design-system/variables.css">
+  <link rel="stylesheet" href="./docs/design-system/base.css">
 </head>
 <body>
+  <div class="gs-container">
+    <div class="gs-game-area">
     <div class="header">
         <h1>🧠 記憶翻牌</h1>
         <p>記住卡片位置，找出所有配對！</p>
@@ -319,5 +323,7 @@
         // 初始化遊戲
         initGame();
     </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
 </body>
 </html>

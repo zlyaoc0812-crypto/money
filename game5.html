@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>數獨挑戰</title>
-    <style>
+  <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', system-ui;
@@ -170,9 +170,13 @@
             .game-container { flex-direction: column; align-items: center; }
             .sudoku-board { width: 90vw; height: 90vw; }
         }
-    </style>
+  </style>
+  <link rel="stylesheet" href="./design-system/variables.css">
+  <link rel="stylesheet" href="./docs/design-system/base.css">
 </head>
 <body>
+  <div class="gs-container">
+    <div class="gs-game-area">
     <div class="header">
         <h1>🔢 數獨挑戰</h1>
         <p>經典數字邏輯遊戲</p>
@@ -714,5 +718,7 @@
         // 初始化遊戲
         initGame();
     </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
 </body>
 </html>

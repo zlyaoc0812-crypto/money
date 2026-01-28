@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打磚塊遊戲</title>
-    <style>
+  <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', system-ui;
@@ -175,9 +175,13 @@
             .game-container, .info-panel { width: 95vw; }
             .game-container { height: 60vw; }
         }
-    </style>
+  </style>
+  <link rel="stylesheet" href="./design-system/variables.css">
+  <link rel="stylesheet" href="./docs/design-system/base.css">
 </head>
 <body>
+  <div class="gs-container">
+    <div class="gs-game-area">
     <div class="header">
         <h1>🕹️ 打磚塊 - 休閒版</h1>
         <p class="subtitle">輕鬆擊碎磚塊，享受休閒時光！</p>
@@ -1173,5 +1177,7 @@
             }, 1000);
         }, 500);
     </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
 </body>
 </html>

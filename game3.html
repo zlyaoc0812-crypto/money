@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>極限躲避大挑戰</title>
-    <style>
+  <style>
         * {
             margin: 0;
             padding: 0;
@@ -629,9 +629,13 @@
                 display: block;
             }
         }
-    </style>
+  </style>
+  <link rel="stylesheet" href="./design-system/variables.css">
+  <link rel="stylesheet" href="./docs/design-system/base.css">
 </head>
 <body>
+  <div class="gs-container">
+    <div class="gs-game-area">
     <div class="game-overlay" id="gameOverlay">
         <div class="overlay-content">
             <h2 id="overlayTitle">遊戲結束</h2>
@@ -1726,5 +1730,7 @@
         // 初始化
         setDifficulty('easy');
     </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
 </body>
 </html>

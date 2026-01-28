@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>俄羅斯方塊</title>
-    <style>
+  <style>
         * {
             margin: 0;
             padding: 0;
@@ -223,9 +223,13 @@
                 max-width: 400px;
             }
         }
-    </style>
+  </style>
+  <link rel="stylesheet" href="./design-system/variables.css">
+  <link rel="stylesheet" href="./docs/design-system/base.css">
 </head>
 <body>
+  <div class="gs-container">
+    <div class="gs-game-area">
     <div class="header">
         <h1>👾 俄羅斯方塊</h1>
         <p>經典方塊消除遊戲</p>
@@ -886,5 +890,7 @@
         // 初始化遊戲
         resetGame();
     </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
 </body>
 </html>
