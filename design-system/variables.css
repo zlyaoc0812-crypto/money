@@ -1,0 +1,14 @@
+:root {
+  --ds-color-primary: #3A7EF4;
+  --ds-color-secondary: #FF6B6B;
+  --ds-color-background: #f6f7fb;
+  --ds-color-surface: #ffffff;
+  --ds-text: #1f2937;
+  --ds-muted: #6b7280;
+  --ds-radius: 12px;
+  --ds-padding: 12px;
+}
+/* Minimal palette tweaks for quick iteration */
+:root {
+  --ds-color-primary-ink: #0b5ed7;
+}
