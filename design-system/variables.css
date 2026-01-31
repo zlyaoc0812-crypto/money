@@ -1,14 +1,161 @@
 :root {
+  /* 色彩系統 */
   --ds-color-primary: #3A7EF4;
   --ds-color-secondary: #FF6B6B;
+  --ds-color-success: #00D4AA;
+  --ds-color-warning: #FFB74D;
+  --ds-color-danger: #FF4757;
+  --ds-color-info: #00D4FF;
+  
+  /* 背景色彩 */
   --ds-color-background: #f6f7fb;
   --ds-color-surface: #ffffff;
+  --ds-color-surface-dark: #1a1a2e;
+  
+  /* 文字色彩 */
   --ds-text: #1f2937;
+  --ds-text-light: #ffffff;
   --ds-muted: #6b7280;
+  --ds-muted-light: #94a3b8;
+  
+  /* 遊戲特定色彩 */
+  --ds-game-primary: #00ff9d;
+  --ds-game-secondary: #00b8ff;
+  --ds-game-accent: #ff9a00;
+  --ds-game-danger: #ff416c;
+  --ds-game-warning: #ffd700;
+  --ds-game-success: #4CAF50;
+  
+  /* 漸變色彩 */
+  --ds-gradient-primary: linear-gradient(135deg, #3A7EF4, #00D4FF);
+  --ds-gradient-secondary: linear-gradient(135deg, #FF6B6B, #FF9A00);
+  --ds-gradient-success: linear-gradient(135deg, #00D4AA, #00FF9D);
+  --ds-gradient-dark: linear-gradient(135deg, #141E30, #243B55);
+  --ds-gradient-game: linear-gradient(135deg, #1a1a2e, #0f3460);
+  
+  /* 尺寸系統 */
   --ds-radius: 12px;
+  --ds-radius-lg: 20px;
+  --ds-radius-xl: 30px;
+  --ds-radius-full: 50px;
+  
   --ds-padding: 12px;
+  --ds-padding-lg: 20px;
+  --ds-padding-xl: 30px;
+  
+  --ds-margin: 12px;
+  --ds-margin-lg: 20px;
+  --ds-margin-xl: 30px;
+  
+  /* 陰影系統 */
+  --ds-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --ds-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --ds-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --ds-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.25);
+  --ds-shadow-glow: 0 0 20px rgba(0, 212, 255, 0.5);
+  
+  /* 動畫速度 */
+  --ds-transition-fast: 0.15s;
+  --ds-transition-normal: 0.3s;
+  --ds-transition-slow: 0.5s;
+  
+  /* 字體系統 */
+  --ds-font-family-base: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ds-font-family-mono: 'Courier New', monospace;
+  --ds-font-family-game: 'Arial', sans-serif;
+  
+  --ds-font-size-xs: 0.75rem;
+  --ds-font-size-sm: 0.875rem;
+  --ds-font-size-base: 1rem;
+  --ds-font-size-lg: 1.125rem;
+  --ds-font-size-xl: 1.25rem;
+  --ds-font-size-2xl: 1.5rem;
+  --ds-font-size-3xl: 2rem;
+  --ds-font-size-4xl: 2.5rem;
+  
+  /* 遊戲容器尺寸 */
+  --ds-game-container-width: 800px;
+  --ds-game-container-height: 500px;
+  --ds-game-canvas-width: 300px;
+  --ds-game-canvas-height: 600px;
+  
+  /* 按鈕尺寸 */
+  --ds-button-height: 44px;
+  --ds-button-padding: 0 24px;
+  --ds-button-border-radius: var(--ds-radius-full);
+  
+  /* 卡片尺寸 */
+  --ds-card-width: 280px;
+  --ds-card-height: 320px;
+  --ds-card-padding: var(--ds-padding-lg);
+  
+  /* 網格系統 */
+  --ds-grid-gap: 20px;
+  --ds-grid-columns: repeat(auto-fit, minmax(280px, 1fr));
+  
+  /* 遊戲元素尺寸 */
+  --ds-player-size: 40px;
+  --ds-obstacle-size-small: 30px;
+  --ds-obstacle-size-medium: 50px;
+  --ds-obstacle-size-large: 70px;
+  --ds-collectible-size: 25px;
+  --ds-powerup-size: 30px;
+  
+  /* 遊戲速度 */
+  --ds-game-speed-slow: 1.0;
+  --ds-game-speed-normal: 1.5;
+  --ds-game-speed-fast: 2.0;
+  
+  /* 透明度 */
+  --ds-opacity-low: 0.3;
+  --ds-opacity-medium: 0.6;
+  --ds-opacity-high: 0.9;
 }
-/* Minimal palette tweaks for quick iteration */
-:root {
-  --ds-color-primary-ink: #0b5ed7;
+
+/* 深色主題 */
+[data-theme="dark"] {
+  --ds-color-background: #0f172a;
+  --ds-color-surface: #1e293b;
+  --ds-text: #f1f5f9;
+  --ds-muted: #94a3b8;
+}
+
+/* 遊戲特定主題 */
+.game-theme-action {
+  --ds-game-primary: #00ff9d;
+  --ds-game-secondary: #00b8ff;
+  --ds-game-accent: #ff9a00;
+}
+
+.game-theme-puzzle {
+  --ds-game-primary: #9966ff;
+  --ds-game-secondary: #ff66cc;
+  --ds-game-accent: #66ffcc;
+}
+
+.game-theme-arcade {
+  --ds-game-primary: #ff416c;
+  --ds-game-secondary: #ff4b2b;
+  --ds-game-accent: #ffd700;
+}
+
+/* 響應式斷點 */
+@media (max-width: 768px) {
+  :root {
+    --ds-game-container-width: 95vw;
+    --ds-game-container-height: 60vw;
+    --ds-card-width: calc(50vw - 30px);
+    --ds-card-height: calc(60vw - 30px);
+    --ds-font-size-4xl: 2rem;
+    --ds-font-size-3xl: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --ds-card-width: calc(100vw - 40px);
+    --ds-card-height: calc(80vw - 40px);
+    --ds-font-size-4xl: 1.75rem;
+    --ds-font-size-3xl: 1.5rem;
+  }
 }

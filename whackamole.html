@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打地鼠遊戲 - 新架構</title>
+    <link rel="stylesheet" href="./design-system/variables.css">
+    <link rel="stylesheet" href="./design-system/base.css">
+    <link rel="stylesheet" href="./design-system/components.css">
+    <style>
+        /* 遊戲特定樣式 */
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            border: 3px solid var(--color-accent-2);
+            margin: 0 auto;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #score { color: var(--color-warning); }
+        #time { color: var(--color-success); }
+        #combo { color: var(--color-danger); }
+        #multiplier { color: var(--color-accent-4); }
+        #lives { color: var(--color-accent-1); }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .hole {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #8b4513, #654321);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 
+                inset 0 10px 20px rgba(0, 0, 0, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 3px solid #5d4037;
+            transition: transform 0.2s;
+        }
+
+        .hole:hover {
+            transform: scale(1.05);
+        }
+
+        .hole::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            bottom: 10%;
+            background: #5d4037;
+            border-radius: 50%;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .mole {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            bottom: -100%;
+            left: 5%;
+            border-radius: 45% 45% 35% 35%;
+            transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .mole.normal {
+            background: linear-gradient(135deg, #8b5a2b, #d2691e);
+        }
+
+        .mole.golden {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+        }
+
+        .mole.bomb {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+        }
+
+        .mole.active {
+            bottom: 0%;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-10px); }
+        }
+
+        .mole::before {
+            position: absolute;
+            top: -35%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            z-index: 3;
+        }
+
+        .mole.normal::before { content: '🐹'; }
+        .mole.golden::before { content: '🐭'; }
+        .mole.bomb::before { content: '💣'; }
+
+        .mole::after {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: 25%;
+            width: 50%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            bottom: -100%;
+            left: 10%;
+            background: linear-gradient(135deg, #636e72, #2d3436);
+            border-radius: 10px;
+            transition: bottom 0.4s;
+            cursor: not-allowed;
+            z-index: 1;
+        }
+
+        .obstacle.active {
+            bottom: 0%;
+        }
+
+        .obstacle::before {
+            content: '🪨';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .difficulty {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .difficulty-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover, .difficulty-btn.active {
+            background: rgba(78, 205, 196, 0.3);
+            border-color: var(--color-accent-2);
+            transform: scale(1.05);
+        }
+
+        .combo-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transform: scale(0);
+            transition: transform 0.3s;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .combo-indicator.show {
+            transform: scale(1);
+        }
+
+        .hit-effect {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: scale(0);
+            animation: hitEffect 0.5s ease-out;
+            z-index: 10;
+        }
+
+        @keyframes hitEffect {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 768px) {
+            .game-board { grid-template-columns: repeat(3, 1fr); }
+            .game-info { grid-template-columns: repeat(3, 1fr); }
+            .controls { flex-direction: column; align-items: center; }
+        }
+
+        @media (max-width: 480px) {
+            .game-board { grid-template-columns: repeat(2, 1fr); }
+            .game-info { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+  <div class="gs-container">
+    <div class="gs-game-area">
+    <div class="combo-indicator" id="comboIndicator">COMBO x1!</div>
+
+    <div class="header">
+        <h1>🐹 瘋狂打地鼠 🎯</h1>
+        <p>擊打地鼠，避開炸彈，挑戰你的反應極限！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="difficulty">
+            <div class="difficulty-btn active" data-difficulty="easy">簡單</div>
+            <div class="difficulty-btn" data-difficulty="medium">中等</div>
+            <div class="difficulty-btn" data-difficulty="hard">困難</div>
+            <div class="difficulty-btn" data-difficulty="insane">瘋狂</div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-box">
+                <h3>分數</h3>
+                <p id="score">0</p>
+            </div>
+            <div class="info-box">
+                <h3>時間</h3>
+                <p id="time">60</p>
+            </div>
+            <div class="info-box">
+                <h3>連擊數</h3>
+                <p id="combo">0</p>
+            </div>
+            <div class="info-box">
+                <h3>倍率</h3>
+                <p id="multiplier">x1.0</p>
+            </div>
+            <div class="info-box">
+                <h3>生命</h3>
+                <p id="lives">3</p>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <!-- 地鼠洞將由JavaScript生成 -->
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 開始遊戲</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸️ 暫停遊戲</button>
+            <button id="resetBtn" class="btn btn-warning">🔄 重新開始</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>遊戲說明</h3>
+        <div class="game-rules">
+            <div class="rule">
+                <div class="rule-icon">🐹</div>
+                <div class="rule-text">普通地鼠：+10分，維持連擊</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🐭</div>
+                <div class="rule-text">黃金地鼠：+50分，連擊+2</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">💣</div>
+                <div class="rule-text">炸彈地鼠：-1生命，重置連擊</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🪨</div>
+                <div class="rule-text">障礙物：無法點擊，持續10秒</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🔥</div>
+                <div class="rule-text">連續擊中：增加倍率（最高x3.0）</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">⏱️</div>
+                <div class="rule-text">時間限制：60秒，倒數結束遊戲</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script type="module">
+        import { WhackAMole } from './src/games/WhackAMole.js';
+
+        // 初始化遊戲
+        const game = new WhackAMole({
+            id: 'whackamole',
+            name: '打地鼠',
+            fps: 60,
+            maxFps: 120,
+            initialLives: 3,
+            maxLives: 5,
+            canvas: {
+                width: 800,
+                height: 600,
+                containerId: 'gameBoard'
+            },
+            debug: {
+                enabled: false,
+                showFps: true,
+                showPerformance: true
+            },
+            features: {
+                sound: true,
+                vibration: true,
+                particles: true,
+                animations: true
+            }
+        });
+
+        // DOM 元素引用
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('time');
+        const comboElement = document.getElementById('combo');
+        const multiplierElement = document.getElementById('multiplier');
+        const livesElement = document.getElementById('lives');
+        const comboIndicator = document.getElementById('comboIndicator');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+        // 事件監聽器
+        game.events.on('score:update', (data) => {
+            scoreElement.textContent = data.score;
+        });
+
+        game.events.on('lives:update', (data) => {
+            livesElement.textContent = data.lives;
+        });
+
+        game.events.on('combo:update', (data) => {
+            comboElement.textContent = data.combo;
+            multiplierElement.textContent = `x${data.multiplier.toFixed(1)}`;
+            
+            // 顯示連擊效果
+            if (data.combo >= 5) {
+                comboIndicator.textContent = `COMBO x${data.combo}! 🔥`;
+                comboIndicator.classList.add('show');
+                setTimeout(() => {
+                    comboIndicator.classList.remove('show');
+                }, 1500);
+            }
+        });
+
+        game.events.on('game:over', (data) => {
+            const resultMessage = `
+                🎮 遊戲結束！\n
+                🏆 最終分數: ${data.score}\n
+                ${data.isWin ? '🎉 勝利！' : '💀 失敗！'}\n
+                🔥 最大連擊: ${data.maxCombo}\n
+                ⭐ 最高倍率: x${data.maxMultiplier.toFixed(1)}
+            `;
+            alert(resultMessage);
+        });
+
+        // 按鈕事件
+        startBtn.addEventListener('click', () => {
+            game.start();
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (game.state.isPaused) {
+                game.resume();
+                pauseBtn.textContent = '⏸️ 暫停遊戲';
+            } else {
+                game.pause();
+                pauseBtn.textContent = '▶️ 繼續遊戲';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停遊戲';
+        });
+
+        // 難度設置
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!game.state.isRunning) {
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    game.setDifficulty(btn.dataset.difficulty);
+                }
+            });
+        });
+
+        // 初始化遊戲
+        game.init().then(() => {
+            console.log('打地鼠遊戲初始化完成');
+        }).catch(error => {
+            console.error('遊戲初始化失敗:', error);
+        });
+    </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
+</body>
+</html>
