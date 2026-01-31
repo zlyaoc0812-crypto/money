@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方塊拼圖 - 新架構</title>
+    <link rel="stylesheet" href="./design-system/variables.css">
+    <link rel="stylesheet" href="./design-system/base.css">
+    <link rel="stylesheet" href="./design-system/components.css">
+    <style>
+        /* 遊戲特定樣式 */
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            border: 3px solid var(--color-accent-2);
+            margin: 0 auto;
+        }
+
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 5px;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .puzzle-tile {
+            background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .puzzle-tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .puzzle-tile.empty {
+            background: transparent;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .puzzle-tile.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .puzzle-tile.movable {
+            background: linear-gradient(135deg, var(--color-warning), #f59e0b);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #moves { color: var(--color-warning); }
+        #timer { color: var(--color-success); }
+        #bestTime { color: var(--color-accent-1); }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 900px;
+            margin: 30px auto 0;
+            border-left: 5px solid var(--color-accent-2);
+        }
+
+        .instructions h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions h3::before {
+            content: '🧩';
+            font-size: 1.5rem;
+        }
+
+        .game-rules {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rule-icon {
+            font-size: 1.8rem;
+            color: var(--color-accent-2);
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        .game-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            border: 3px solid var(--color-success);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.5);
+        }
+
+        .game-complete.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .complete-message {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--color-success);
+        }
+
+        .complete-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat h4 {
+            color: var(--color-accent-2);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stat p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .puzzle-board {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .puzzle-tile {
+                font-size: 2rem;
+            }
+            
+            .info-panel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .game-rules {
+                grid-template-columns: 1fr;
+            }
+            
+            .complete-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .puzzle-board {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .puzzle-tile {
+                font-size: 1.5rem;
+            }
+            
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div class="gs-container">
+    <div class="gs-game-area">
+    <div class="game-complete" id="gameComplete">
+        <div class="complete-message">🎉 拼圖完成！</div>
+        <div class="complete-stats">
+            <div class="stat">
+                <h4>完成時間</h4>
+                <p id="completeTime">0:00</p>
+            </div>
+            <div class="stat">
+                <h4>移動次數</h4>
+                <p id="completeMoves">0</p>
+            </div>
+            <div class="stat">
+                <h4>最佳時間</h4>
+                <p id="completeBestTime">0:00</p>
+            </div>
+            <div class="stat">
+                <h4>排名</h4>
+                <p id="completeRank">#1</p>
+            </div>
+        </div>
+        <button id="newGameBtn" class="btn btn-primary">🔄 新遊戲</button>
+        <a href="index.html" class="btn btn-secondary">← 返回遊戲館</a>
+    </div>
+
+    <div class="header">
+        <h1>🧱 方塊拼圖 🧩</h1>
+        <p>移動方塊完成拼圖，挑戰你的邏輯思維！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="puzzle-board" id="puzzleBoard">
+            <!-- 拼圖方塊將由JavaScript生成 -->
+        </div>
+
+        <div class="info-panel">
+            <div class="info-box">
+                <h3>移動次數</h3>
+                <p id="moves">0</p>
+            </div>
+            <div class="info-box">
+                <h3>計時器</h3>
+                <p id="timer">0:00</p>
+            </div>
+            <div class="info-box">
+                <h3>最佳時間</h3>
+                <p id="bestTime">0:00</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 開始遊戲</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸️ 暫停計時</button>
+            <button id="resetBtn" class="btn btn-warning">🔄 重新開始</button>
+            <button id="shuffleBtn" class="btn btn-info">🔀 重新洗牌</button>
+            <button id="hintBtn" class="btn btn-success">💡 提示</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>遊戲規則</h3>
+        <div class="game-rules">
+            <div class="rule">
+                <div class="rule-icon">🎯</div>
+                <div class="rule-text">點擊方塊移動到空白位置</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🧩</div>
+                <div class="rule-text">將方塊按數字順序排列</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">⏱️</div>
+                <div class="rule-text">在最短時間內完成拼圖</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🏆</div>
+                <div class="rule-text">使用最少移動次數獲得高分</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script type="module">
+        import { Puzzle } from './src/games/Puzzle.js';
+
+        // 初始化遊戲
+        const game = new Puzzle({
+            id: 'puzzle',
+            name: '方塊拼圖',
+            fps: 60,
+            maxFps: 120,
+            initialLives: 1,
+            maxLives: 1,
+            canvas: {
+                width: 400,
+                height: 400,
+                containerId: 'puzzleBoard'
+            },
+            debug: {
+                enabled: false,
+                showFps: true,
+                showPerformance: true
+            },
+            features: {
+                sound: true,
+                vibration: true,
+                particles: true,
+                animations: true
+            }
+        });
+
+        // DOM 元素引用
+        const movesElement = document.getElementById('moves');
+        const timerElement = document.getElementById('timer');
+        const bestTimeElement = document.getElementById('bestTime');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const gameCompleteScreen = document.getElementById('gameComplete');
+        const completeTimeElement = document.getElementById('completeTime');
+        const completeMovesElement = document.getElementById('completeMoves');
+        const completeBestTimeElement = document.getElementById('completeBestTime');
+        const completeRankElement = document.getElementById('completeRank');
+        const newGameBtn = document.getElementById('newGameBtn');
+
+        // 事件監聽器
+        game.events.on('moves:update', (data) => {
+            movesElement.textContent = data.moves;
+        });
+
+        game.events.on('timer:update', (data) => {
+            const minutes = Math.floor(data.time / 60);
+            const seconds = data.time % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+
+        game.events.on('bestTime:update', (data) => {
+            const minutes = Math.floor(data.bestTime / 60);
+            const seconds = data.bestTime % 60;
+            bestTimeElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+
+        game.events.on('game:complete', (data) => {
+            completeTimeElement.textContent = timerElement.textContent;
+            completeMovesElement.textContent = data.moves;
+            completeBestTimeElement.textContent = bestTimeElement.textContent;
+            completeRankElement.textContent = `#${data.rank}`;
+            gameCompleteScreen.classList.add('show');
+        });
+
+        // 按鈕事件
+        startBtn.addEventListener('click', () => {
+            game.start();
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            shuffleBtn.disabled = true;
+            hintBtn.disabled = false;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (game.state.isPaused) {
+                game.resume();
+                pauseBtn.textContent = '⏸️ 暫停計時';
+            } else {
+                game.pause();
+                pauseBtn.textContent = '▶️ 繼續計時';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停計時';
+            shuffleBtn.disabled = false;
+            hintBtn.disabled = true;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            game.shuffle();
+        });
+
+        hintBtn.addEventListener('click', () => {
+            game.showHint();
+        });
+
+        newGameBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停計時';
+            shuffleBtn.disabled = false;
+            hintBtn.disabled = true;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        // 拼圖方塊點擊事件
+        document.getElementById('puzzleBoard').addEventListener('click', (event) => {
+            const tile = event.target.closest('.puzzle-tile');
+            if (tile && !tile.classList.contains('empty')) {
+                const tileIndex = parseInt(tile.dataset.index);
+                game.moveTile(tileIndex);
+            }
+        });
+
+        // 初始化遊戲
+        game.init().then(() => {
+            console.log('方塊拼圖遊戲初始化完成');
+        }).catch(error => {
+            console.error('遊戲初始化失敗:', error);
+        });
+    </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
+</body>
+</html>

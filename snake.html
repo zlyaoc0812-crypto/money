@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貪食蛇 - 新架構</title>
+    <link rel="stylesheet" href="./design-system/variables.css">
+    <link rel="stylesheet" href="./design-system/base.css">
+    <link rel="stylesheet" href="./design-system/components.css">
+    <style>
+        /* 遊戲特定樣式 */
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            border: 3px solid var(--color-accent-2);
+            margin: 0 auto;
+        }
+
+        .game-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #score { color: var(--color-warning); }
+        #length { color: var(--color-success); }
+        #speed { color: var(--color-accent-1); }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 900px;
+            margin: 30px auto 0;
+            border-left: 5px solid var(--color-accent-2);
+        }
+
+        .instructions h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions h3::before {
+            content: '🎮';
+            font-size: 1.5rem;
+        }
+
+        .key-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .key {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .key-icon {
+            font-size: 1.8rem;
+            color: var(--color-accent-2);
+        }
+
+        .key-text {
+            flex: 1;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            display: none;
+            border: 3px solid var(--color-accent-2);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.5);
+        }
+
+        .game-over.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .info-panel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .key-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div class="gs-container">
+    <div class="gs-game-area">
+    <div class="header">
+        <h1>🐍 貪食蛇 🍎</h1>
+        <p>控制蛇吃到食物，避免撞牆或咬到自己！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="game-area">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+            <div class="game-over" id="gameOver">
+                <h2>💀 遊戲結束</h2>
+                <p id="finalScore">最終分數: 0</p>
+                <p id="finalLength">最長長度: 1</p>
+                <p id="finalSpeed">最高速度: 1</p>
+                <button id="restartBtn" class="btn btn-primary">🔄 重新開始</button>
+                <a href="index.html" class="btn btn-secondary">← 返回遊戲館</a>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-box">
+                <h3>分數</h3>
+                <p id="score">0</p>
+            </div>
+            <div class="info-box">
+                <h3>長度</h3>
+                <p id="length">1</p>
+            </div>
+            <div class="info-box">
+                <h3>速度</h3>
+                <p id="speed">1</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 開始遊戲</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸️ 暫停遊戲</button>
+            <button id="resetBtn" class="btn btn-warning">🔄 重新開始</button>
+            <button id="speedUpBtn" class="btn btn-danger">⚡ 加速</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>遊戲控制</h3>
+        <div class="key-controls">
+            <div class="key">
+                <div class="key-icon">⬅️</div>
+                <div class="key-text">向左移動</div>
+            </div>
+            <div class="key">
+                <div class="key-icon">➡️</div>
+                <div class="key-text">向右移動</div>
+            </div>
+            <div class="key">
+                <div class="key-icon">⬆️</div>
+                <div class="key-text">向上移動</div>
+            </div>
+            <div class="key">
+                <div class="key-icon">⬇️</div>
+                <div class="key-text">向下移動</div>
+            </div>
+            <div class="key">
+                <div class="key-icon">空格鍵</div>
+                <div class="key-text">暫停/繼續</div>
+            </div>
+            <div class="key">
+                <div class="key-icon">S</div>
+                <div class="key-text">加速</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script type="module">
+        import { Snake } from './src/games/Snake.js';
+
+        // 初始化遊戲
+        const game = new Snake({
+            id: 'snake',
+            name: '貪食蛇',
+            fps: 60,
+            maxFps: 120,
+            initialLives: 1,
+            maxLives: 1,
+            canvas: {
+                width: 600,
+                height: 400,
+                containerId: 'gameCanvas'
+            },
+            debug: {
+                enabled: false,
+                showFps: true,
+                showPerformance: true
+            },
+            features: {
+                sound: true,
+                vibration: true,
+                particles: true,
+                animations: true
+            }
+        });
+
+        // DOM 元素引用
+        const scoreElement = document.getElementById('score');
+        const lengthElement = document.getElementById('length');
+        const speedElement = document.getElementById('speed');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedUpBtn = document.getElementById('speedUpBtn');
+        const gameOverScreen = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const finalLengthElement = document.getElementById('finalLength');
+        const finalSpeedElement = document.getElementById('finalSpeed');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 事件監聽器
+        game.events.on('score:update', (data) => {
+            scoreElement.textContent = data.score;
+        });
+
+        game.events.on('length:update', (data) => {
+            lengthElement.textContent = data.length;
+        });
+
+        game.events.on('speed:update', (data) => {
+            speedElement.textContent = data.speed;
+        });
+
+        game.events.on('game:over', (data) => {
+            finalScoreElement.textContent = `最終分數: ${data.score}`;
+            finalLengthElement.textContent = `最長長度: ${data.length}`;
+            finalSpeedElement.textContent = `最高速度: ${data.speed}`;
+            gameOverScreen.classList.add('show');
+        });
+
+        // 按鈕事件
+        startBtn.addEventListener('click', () => {
+            game.start();
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            speedUpBtn.disabled = false;
+            gameOverScreen.classList.remove('show');
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (game.state.isPaused) {
+                game.resume();
+                pauseBtn.textContent = '⏸️ 暫停遊戲';
+            } else {
+                game.pause();
+                pauseBtn.textContent = '▶️ 繼續遊戲';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停遊戲';
+            speedUpBtn.disabled = true;
+            gameOverScreen.classList.remove('show');
+        });
+
+        speedUpBtn.addEventListener('click', () => {
+            game.increaseSpeed();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停遊戲';
+            speedUpBtn.disabled = true;
+            gameOverScreen.classList.remove('show');
+        });
+
+        // 鍵盤控制
+        document.addEventListener('keydown', (event) => {
+            if (!game.state.isRunning || game.state.isPaused) return;
+            
+            switch(event.key) {
+                case 'ArrowLeft':
+                    game._handleKeyDown({ key: 'ArrowLeft' });
+                    break;
+                case 'ArrowRight':
+                    game._handleKeyDown({ key: 'ArrowRight' });
+                    break;
+                case 'ArrowUp':
+                    game._handleKeyDown({ key: 'ArrowUp' });
+                    break;
+                case 'ArrowDown':
+                    game._handleKeyDown({ key: 'ArrowDown' });
+                    break;
+                case ' ':
+                    game.togglePause();
+                    pauseBtn.textContent = game.state.isPaused ? '▶️ 繼續遊戲' : '⏸️ 暫停遊戲';
+                    break;
+                case 's':
+                case 'S':
+                    game.increaseSpeed();
+                    break;
+            }
+        });
+
+        // 初始化遊戲
+        game.init().then(() => {
+            console.log('貪食蛇遊戲初始化完成');
+        }).catch(error => {
+            console.error('遊戲初始化失敗:', error);
+        });
+    </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
+</body>
+</html>

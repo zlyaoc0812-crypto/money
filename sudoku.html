@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數獨挑戰 - 新架構</title>
+    <link rel="stylesheet" href="./design-system/variables.css">
+    <link rel="stylesheet" href="./design-system/base.css">
+    <link rel="stylesheet" href="./design-system/components.css">
+    <style>
+        /* 遊戲特定樣式 */
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            border: 3px solid var(--color-accent-2);
+            margin: 0 auto;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sudoku-board {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            gap: 2px;
+            aspect-ratio: 1;
+        }
+
+        .sudoku-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sudoku-cell:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .sudoku-cell.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: var(--color-accent-1);
+        }
+
+        .sudoku-cell.fixed {
+            color: var(--color-accent-1);
+            cursor: default;
+        }
+
+        .sudoku-cell.error {
+            background: rgba(239, 68, 68, 0.3);
+            color: var(--color-danger);
+        }
+
+        .sudoku-cell.correct {
+            background: rgba(16, 185, 129, 0.3);
+            color: var(--color-success);
+        }
+
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .number-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid var(--color-accent-1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .number-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: scale(1.05);
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .info-box h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #timer { color: var(--color-warning); }
+        #hints { color: var(--color-accent-4); }
+        #errors { color: var(--color-danger); }
+        #difficulty { color: var(--color-success); }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .game-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            border: 3px solid var(--color-success);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.5);
+        }
+
+        .game-complete.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .complete-message {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--color-success);
+        }
+
+        .complete-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat h4 {
+            color: var(--color-accent-2);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stat p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .complete-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .sudoku-cell {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div class="gs-container">
+    <div class="gs-game-area">
+    <div class="game-complete" id="gameComplete">
+        <div class="complete-message">🎉 恭喜完成！</div>
+        <div class="complete-stats">
+            <div class="stat">
+                <h4>完成時間</h4>
+                <p id="completeTime">0:00</p>
+            </div>
+            <div class="stat">
+                <h4>使用提示</h4>
+                <p id="completeHints">0</p>
+            </div>
+            <div class="stat">
+                <h4>錯誤次數</h4>
+                <p id="completeErrors">0</p>
+            </div>
+            <div class="stat">
+                <h4>難度</h4>
+                <p id="completeDifficulty">簡單</p>
+            </div>
+        </div>
+        <button id="newGameBtn" class="btn btn-primary">🔄 新遊戲</button>
+        <a href="index.html" class="btn btn-secondary">← 返回遊戲館</a>
+    </div>
+
+    <div class="header">
+        <h1>🔢 數獨挑戰 🧩</h1>
+        <p>經典數字邏輯遊戲，挑戰你的腦力極限！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="game-area">
+            <div class="sudoku-board" id="sudokuBoard">
+                <!-- 數獨格子將由JavaScript生成 -->
+            </div>
+            
+            <div class="side-panel">
+                <div class="controls-panel">
+                    <div class="action-buttons">
+                        <button class="number-btn" data-number="1">1</button>
+                        <button class="number-btn" data-number="2">2</button>
+                        <button class="number-btn" data-number="3">3</button>
+                        <button class="number-btn" data-number="4">4</button>
+                        <button class="number-btn" data-number="5">5</button>
+                        <button class="number-btn" data-number="6">6</button>
+                        <button class="number-btn" data-number="7">7</button>
+                        <button class="number-btn" data-number="8">8</button>
+                        <button class="number-btn" data-number="9">9</button>
+                        <button class="number-btn" data-number="0">清除</button>
+                        <button class="number-btn" id="hintBtn">💡 提示</button>
+                        <button class="number-btn" id="undoBtn">↩️ 復原</button>
+                    </div>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="info-box">
+                        <h3>計時器</h3>
+                        <p id="timer">0:00</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>提示次數</h3>
+                        <p id="hints">3</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>錯誤次數</h3>
+                        <p id="errors">0</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>難度</h3>
+                        <p id="difficulty">簡單</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 開始遊戲</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸️ 暫停計時</button>
+            <button id="resetBtn" class="btn btn-warning">🔄 重新開始</button>
+            <button id="checkBtn" class="btn btn-success">✓ 檢查答案</button>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script type="module">
+        import { Sudoku } from './src/games/Sudoku.js';
+
+        // 初始化遊戲
+        const game = new Sudoku({
+            id: 'sudoku',
+            name: '數獨挑戰',
+            fps: 60,
+            maxFps: 120,
+            initialLives: 1,
+            maxLives: 1,
+            canvas: {
+                width: 450,
+                height: 450,
+                containerId: 'sudokuBoard'
+            },
+            debug: {
+                enabled: false,
+                showFps: true,
+                showPerformance: true
+            },
+            features: {
+                sound: true,
+                vibration: true,
+                particles: true,
+                animations: true
+            }
+        });
+
+        // DOM 元素引用
+        const timerElement = document.getElementById('timer');
+        const hintsElement = document.getElementById('hints');
+        const errorsElement = document.getElementById('errors');
+        const difficultyElement = document.getElementById('difficulty');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const numberBtns = document.querySelectorAll('.number-btn[data-number]');
+        const gameCompleteScreen = document.getElementById('gameComplete');
+        const completeTimeElement = document.getElementById('completeTime');
+        const completeHintsElement = document.getElementById('completeHints');
+        const completeErrorsElement = document.getElementById('completeErrors');
+        const completeDifficultyElement = document.getElementById('completeDifficulty');
+        const newGameBtn = document.getElementById('newGameBtn');
+
+        // 事件監聽器
+        game.events.on('timer:update', (data) => {
+            const minutes = Math.floor(data.time / 60);
+            const seconds = data.time % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+
+        game.events.on('hints:update', (data) => {
+            hintsElement.textContent = data.hints;
+        });
+
+        game.events.on('errors:update', (data) => {
+            errorsElement.textContent = data.errors;
+        });
+
+        game.events.on('difficulty:update', (data) => {
+            difficultyElement.textContent = data.difficulty;
+        });
+
+        game.events.on('game:complete', (data) => {
+            completeTimeElement.textContent = timerElement.textContent;
+            completeHintsElement.textContent = data.hintsUsed;
+            completeErrorsElement.textContent = data.errors;
+            completeDifficultyElement.textContent = data.difficulty;
+            gameCompleteScreen.classList.add('show');
+        });
+
+        // 按鈕事件
+        startBtn.addEventListener('click', () => {
+            game.start();
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            checkBtn.disabled = false;
+            hintBtn.disabled = false;
+            undoBtn.disabled = false;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (game.state.isPaused) {
+                game.resume();
+                pauseBtn.textContent = '⏸️ 暫停計時';
+            } else {
+                game.pause();
+                pauseBtn.textContent = '▶️ 繼續計時';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停計時';
+            checkBtn.disabled = true;
+            hintBtn.disabled = true;
+            undoBtn.disabled = true;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        checkBtn.addEventListener('click', () => {
+            game.checkSolution();
+        });
+
+        hintBtn.addEventListener('click', () => {
+            game.useHint();
+        });
+
+        undoBtn.addEventListener('click', () => {
+            game.undoMove();
+        });
+
+        newGameBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停計時';
+            checkBtn.disabled = true;
+            hintBtn.disabled = true;
+            undoBtn.disabled = true;
+            gameCompleteScreen.classList.remove('show');
+        });
+
+        // 數字按鈕事件
+        numberBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const number = parseInt(btn.dataset.number);
+                if (number === 0) {
+                    game.clearCell();
+                } else {
+                    game.setCellValue(number);
+                }
+            });
+        });
+
+        // 初始化遊戲
+        game.init().then(() => {
+            console.log('數獨遊戲初始化完成');
+        }).catch(error => {
+            console.error('遊戲初始化失敗:', error);
+        });
+    </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
+</body>
+</html>

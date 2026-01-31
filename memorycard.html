@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記憶翻牌 - 新架構</title>
+    <link rel="stylesheet" href="./design-system/variables.css">
+    <link rel="stylesheet" href="./design-system/base.css">
+    <link rel="stylesheet" href="./design-system/components.css">
+    <style>
+        /* 遊戲特定樣式 */
+        .game-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            border: 3px solid var(--color-accent-2);
+            margin: 0 auto;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .info-box h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #moves { color: var(--color-warning); }
+        #timer { color: var(--color-success); }
+        #matches { color: var(--color-accent-1); }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .card.matched {
+            opacity: 0.5;
+            cursor: default;
+            transform: scale(0.95);
+        }
+
+        .card.matched .card-front {
+            background: linear-gradient(135deg, var(--color-success), #10b981);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .difficulty-btn {
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .difficulty-btn:hover, .difficulty-btn.active {
+            background: rgba(16, 185, 129, 0.3);
+            border-color: var(--color-accent-2);
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 900px;
+            margin: 30px auto 0;
+            border-left: 5px solid var(--color-accent-2);
+        }
+
+        .instructions h3 {
+            color: var(--color-accent-2);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions h3::before {
+            content: '🧠';
+            font-size: 1.5rem;
+        }
+
+        .game-rules {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rule-icon {
+            font-size: 1.8rem;
+            color: var(--color-accent-2);
+        }
+
+        .rule-text {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .game-info {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .game-rules {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-front, .card-back {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div class="gs-container">
+    <div class="gs-game-area">
+    <div class="header">
+        <h1>🧠 記憶翻牌 🃏</h1>
+        <p>考驗記憶力的配對遊戲，找出所有相同的卡片！</p>
+    </div>
+
+    <div class="game-container">
+        <div class="difficulty-selector">
+            <div class="difficulty-btn active" data-difficulty="easy">簡單 (4x4)</div>
+            <div class="difficulty-btn" data-difficulty="medium">中等 (4x5)</div>
+            <div class="difficulty-btn" data-difficulty="hard">困難 (5x6)</div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-box">
+                <h3>移動次數</h3>
+                <p id="moves">0</p>
+            </div>
+            <div class="info-box">
+                <h3>計時器</h3>
+                <p id="timer">0:00</p>
+            </div>
+            <div class="info-box">
+                <h3>配對數</h3>
+                <p id="matches">0/8</p>
+            </div>
+        </div>
+
+        <div class="card-grid" id="cardGrid">
+            <!-- 卡片將由JavaScript生成 -->
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 開始遊戲</button>
+            <button id="pauseBtn" class="btn btn-secondary">⏸️ 暫停遊戲</button>
+            <button id="resetBtn" class="btn btn-warning">🔄 重新開始</button>
+            <button id="hintBtn" class="btn btn-info">💡 提示</button>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>遊戲規則</h3>
+        <div class="game-rules">
+            <div class="rule">
+                <div class="rule-icon">🎯</div>
+                <div class="rule-text">點擊卡片翻開它</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🔍</div>
+                <div class="rule-text">找出所有相同的卡片配對</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">⏱️</div>
+                <div class="rule-text">在最短時間內完成所有配對</div>
+            </div>
+            <div class="rule">
+                <div class="rule-icon">🏆</div>
+                <div class="rule-text">使用最少移動次數獲得高分</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-btn">← 返回遊戲館</a>
+
+    <script type="module">
+        import { MemoryCard } from './src/games/MemoryCard.js';
+
+        // 初始化遊戲
+        const game = new MemoryCard({
+            id: 'memorycard',
+            name: '記憶翻牌',
+            fps: 60,
+            maxFps: 120,
+            initialLives: 1,
+            maxLives: 1,
+            canvas: {
+                width: 800,
+                height: 600,
+                containerId: 'cardGrid'
+            },
+            debug: {
+                enabled: false,
+                showFps: true,
+                showPerformance: true
+            },
+            features: {
+                sound: true,
+                vibration: true,
+                particles: true,
+                animations: true
+            }
+        });
+
+        // DOM 元素引用
+        const movesElement = document.getElementById('moves');
+        const timerElement = document.getElementById('timer');
+        const matchesElement = document.getElementById('matches');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const hintBtn = document.getElementById('hintBtn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+        // 事件監聽器
+        game.events.on('moves:update', (data) => {
+            movesElement.textContent = data.moves;
+        });
+
+        game.events.on('timer:update', (data) => {
+            const minutes = Math.floor(data.time / 60);
+            const seconds = data.time % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+
+        game.events.on('matches:update', (data) => {
+            matchesElement.textContent = `${data.matches}/${data.totalPairs}`;
+        });
+
+        game.events.on('game:complete', (data) => {
+            const resultMessage = `
+                🎉 遊戲完成！\n
+                ⏱️ 時間: ${timerElement.textContent}\n
+                🎯 移動次數: ${data.moves}\n
+                🏆 配對數: ${data.matches}/${data.totalPairs}\n
+                ⭐ 得分: ${data.score}
+            `;
+            alert(resultMessage);
+        });
+
+        // 按鈕事件
+        startBtn.addEventListener('click', () => {
+            game.start();
+            startBtn.disabled = true;
+            startBtn.textContent = '遊戲進行中...';
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            hintBtn.disabled = false;
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            if (game.state.isPaused) {
+                game.resume();
+                pauseBtn.textContent = '⏸️ 暫停遊戲';
+            } else {
+                game.pause();
+                pauseBtn.textContent = '▶️ 繼續遊戲';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            game.restart();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 開始遊戲';
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸️ 暫停遊戲';
+            hintBtn.disabled = true;
+        });
+
+        hintBtn.addEventListener('click', () => {
+            game.showHint();
+        });
+
+        // 難度設置
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!game.state.isRunning) {
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    game.setDifficulty(btn.dataset.difficulty);
+                }
+            });
+        });
+
+        // 卡片點擊事件
+        document.getElementById('cardGrid').addEventListener('click', (event) => {
+            const card = event.target.closest('.card');
+            if (card && !card.classList.contains('matched') && !card.classList.contains('flipped')) {
+                const cardIndex = parseInt(card.dataset.index);
+                game._handleCardClick({ target: { dataset: { index: cardIndex } } });
+            }
+        });
+
+        // 初始化遊戲
+        game.init().then(() => {
+            console.log('記憶翻牌遊戲初始化完成');
+        }).catch(error => {
+            console.error('遊戲初始化失敗:', error);
+        });
+    </script>
+  </div> <!-- gs-game-area -->
+  </div> <!-- gs-container -->
+</body>
+</html>
