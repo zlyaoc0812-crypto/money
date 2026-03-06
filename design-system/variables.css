@@ -113,7 +113,8 @@
 }
 
 /* 深色主題 */
-[data-theme="dark"] {
+[data-theme="dark"],
+.dark {
   --ds-color-background: #0f172a;
   --ds-color-surface: #1e293b;
   --ds-text: #f1f5f9;

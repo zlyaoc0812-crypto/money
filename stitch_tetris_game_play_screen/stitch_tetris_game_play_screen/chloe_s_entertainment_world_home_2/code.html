@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-HK"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chloe的娛樂天地</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3c80f6",
+                        "primary-dark": "#1d4ed8",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0f172a",
+                        "surface-dark": "#1e293b",
+                        "accent-green": "#10b981",
+                        "accent-gold": "#f59e0b",
+                        "accent-red": "#ef4444",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "Noto Sans TC", "sans-serif"],
+                        body: ["Noto Sans TC", "sans-serif"],
+                    },
+                    backgroundImage: {
+                        'tech-grid': "linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)",
+                        'hero-glow': "radial-gradient(circle at 50% 0%, rgba(60, 128, 246, 0.15), transparent 70%)"
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-panel {
+            @apply bg-[#1e293b]/70 backdrop-blur-xl border border-white/5;
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(60, 128, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-body min-h-screen flex flex-col relative overflow-x-hidden text-slate-900 dark:text-slate-100 selection:bg-primary selection:text-white">
+<div class="fixed inset-0 z-0 pointer-events-none" style="background-size: 40px 40px; background-image: linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px); opacity: 0.2;"></div>
+<div class="fixed inset-0 z-0 pointer-events-none bg-hero-glow"></div>
+<header class="sticky top-0 z-50 glass-panel border-b border-slate-700/50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-600 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-2xl">sports_esports</span>
+</div>
+<h1 class="font-display font-bold text-xl tracking-tight text-white">Chloe的娛樂天地</h1>
+</div>
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-sm font-medium text-white hover:text-primary transition-colors" href="#">首頁</a>
+<a class="text-sm font-medium text-slate-400 hover:text-primary transition-colors" href="#">排行榜</a>
+<a class="text-sm font-medium text-slate-400 hover:text-primary transition-colors" href="#">關於我們</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex relative">
+<input class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-full pl-10 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-48 lg:w-64 placeholder-slate-500 transition-all" placeholder="搜尋遊戲..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2 text-slate-500 text-[20px]">search</span>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-800/50 border border-slate-700 text-slate-300 hover:text-yellow-400 hover:border-yellow-400/50 transition-all group" title="切換至淺色模式">
+<span class="material-symbols-outlined text-[22px] group-hover:rotate-45 transition-transform duration-300">light_mode</span>
+</button>
+<button class="bg-primary hover:bg-blue-600 text-white text-sm font-bold py-2 px-6 rounded-full transition-all shadow-lg shadow-primary/25">
+                        登入
+                    </button>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow z-10 relative px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto w-full">
+<div class="rounded-2xl overflow-hidden relative mb-12 group">
+<div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/80 to-transparent z-10"></div>
+<img alt="Hero Background" class="w-full h-[400px] object-cover object-center group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNTPcCYH1-oQAuqt65CvCLoDAWHFBUxb5kJIeg1awmLNc0MUaAlHvQ3fRkZbNVALUhHjfpTUcOfxi-v5zIkOshqg3purcmGMkxfgijvD8PRj2g4C3gqLKC2cdfOeOdp3KrwQrwbI4t_xpjgO5CCLbBBIkAbJ_12OQoBpsn9S36a2gWqWBya67QPO9BLegDgEyIH6IhDbj1WZpRt50JqJH-1fD6Ve13WlRslUMP7jEs8vOqHu-lb_N8_HWUr-S9Jtm_sDrz2LCESDM"/>
+<div class="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 w-fit mb-4 backdrop-blur-sm">
+<span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+<span class="text-xs font-medium text-primary-300">每日更新 • 暢玩無阻</span>
+</div>
+<h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-black text-white mb-4 leading-tight text-glow">
+                    探索無限樂趣<br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">Chloe的娛樂天地</span>
+</h2>
+<p class="text-slate-300 text-lg md:text-xl mb-8 max-w-xl font-light">
+                    超過 20 款精選小遊戲 | 多種類別，每日更新，隨時隨地享受樂趣。無需下載，點擊即玩。
+                </p>
+<div class="flex gap-4">
+<button class="bg-primary hover:bg-blue-600 text-white text-base font-bold py-3 px-8 rounded-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+<span class="material-symbols-outlined">play_arrow</span>
+                        開始遊戲
+                    </button>
+<button class="bg-slate-700/50 hover:bg-slate-700 text-white text-base font-medium py-3 px-8 rounded-lg transition-all backdrop-blur-sm border border-slate-600 flex items-center gap-2">
+<span class="material-symbols-outlined">star</span>
+                        熱門排行
+                    </button>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap gap-3 mb-10 pb-4 border-b border-slate-800">
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 transition-transform hover:-translate-y-0.5">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+                全部遊戲
+            </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium transition-all border border-slate-700 hover:border-slate-600">
+<span class="material-symbols-outlined text-[20px]">swords</span>
+                動作冒險
+            </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium transition-all border border-slate-700 hover:border-slate-600">
+<span class="material-symbols-outlined text-[20px]">extension</span>
+                益智解謎
+            </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium transition-all border border-slate-700 hover:border-slate-600">
+<span class="material-symbols-outlined text-[20px]">videogame_asset</span>
+                經典街機
+            </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium transition-all border border-slate-700 hover:border-slate-600">
+<span class="material-symbols-outlined text-[20px]">local_cafe</span>
+                休閒放鬆
+            </button>
+</div>
+<h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">local_fire_department</span>
+            熱門推薦
+        </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl shadow-lg">🚀</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-red/20 text-accent-red border border-accent-red/20">Hard</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">星際大戰</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">駕駛戰機穿越星際，擊敗外星入侵者，保衛銀河系。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-3xl shadow-lg">💎</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-green/20 text-accent-green border border-accent-green/20">Easy</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">寶石方塊</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">經典消除遊戲，連接三個相同的寶石即可得分，挑戰最高連擊。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-3xl shadow-lg">🐍</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-gold/20 text-accent-gold border border-accent-gold/20">Medium</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">貪吃蛇進化版</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">不僅僅是變長，還能獲得特殊能力！小心不要撞到牆壁。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-3xl shadow-lg">🔢</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-red/20 text-accent-red border border-accent-red/20">Hard</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">數獨挑戰</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">考驗你的邏輯思維，填入數字解開謎題，每日一道新題目。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-3xl shadow-lg">🏎️</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-gold/20 text-accent-gold border border-accent-gold/20">Medium</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">極速賽車</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">在霓虹賽道上盡情奔馳，躲避障礙物，收集金幣升級車輛。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-violet-500 to-purple-800 flex items-center justify-center text-3xl shadow-lg">👻</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-green/20 text-accent-green border border-accent-green/20">Easy</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">小精靈迷宮</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">吃掉所有豆子，躲避鬼魂的追捕，經典玩法重現。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-3xl shadow-lg">🃏</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-gold/20 text-accent-gold border border-accent-gold/20">Medium</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">Solitaire 接龍</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">放鬆心情的經典撲克牌遊戲，多種難度與牌背可選。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-slate-800/80 transition-all duration-300 group flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">favorite</span></button>
+</div>
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-3xl shadow-lg">🧱</div>
+<span class="px-2 py-1 rounded text-xs font-bold bg-accent-red/20 text-accent-red border border-accent-red/20">Hard</span>
+</div>
+<h4 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">打磚塊 3D</h4>
+<p class="text-slate-400 text-sm mb-6 line-clamp-2 flex-grow">控制擋板，擊碎所有磚塊，體驗炫酷的 3D 特效與物理碰撞。</p>
+<button class="w-full py-2.5 rounded-lg bg-primary hover:bg-blue-600 text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-primary/25">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    開始
+                </button>
+</div>
+</div>
+<div class="mt-16 mb-8">
+<div class="glass-panel rounded-2xl p-8 border border-primary/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+<div class="w-full md:w-1/3 aspect-video rounded-xl overflow-hidden shadow-2xl border border-slate-600">
+<img alt="Challenge of the week" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvzgZ7TW_pxagHDvVP3TraPl7H22xF_1ZpmkvVuKQ4M98fN5Kd3fHrsxkPwclBqSmtKeImujH4YS4ZNyjsK998ONdPzuUcHB6xOTVefT6ADtLbQ9Lpw8lUiSgYuyN6d4qy6kRMEebQyOGe7W9vWjx8zMgXGVcJGOVcz7D9ooYUw6RmYnimzasTUmQpNsKFWHmiBwESQa1Y5ul7J_GZvqzoN58RTSI5dUQ5t96VKvp-lGZYsNILlH-_SyoRJJETWw4wlgyA5ZUgjc8"/>
+</div>
+<div class="flex-1 text-center md:text-left">
+<span class="inline-block px-3 py-1 bg-gradient-to-r from-purple-500 to-primary rounded-full text-xs font-bold text-white mb-3">
+                            本週挑戰
+                        </span>
+<h3 class="text-2xl md:text-3xl font-display font-bold text-white mb-3">挑戰極限：霓虹跑酷</h3>
+<p class="text-slate-400 mb-6">在本週的排行榜中獲得前 100 名，即可贏得專屬限定頭像框！目前已有 2,345 位玩家參與。</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+<button class="px-6 py-3 bg-white text-slate-900 hover:bg-slate-100 font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">emoji_events</span>
+                                立即參加
+                            </button>
+<button class="px-6 py-3 bg-transparent border border-slate-500 text-white hover:border-white hover:bg-slate-800 font-medium rounded-lg transition-colors">
+                                查看規則
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="glass-panel border-t border-slate-700/50 mt-auto z-10 relative">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+<div class="col-span-1 md:col-span-2">
+<div class="flex items-center gap-2 mb-4">
+<div class="flex items-center justify-center w-8 h-8 rounded bg-primary">
+<span class="material-symbols-outlined text-white text-lg">sports_esports</span>
+</div>
+<span class="text-xl font-display font-bold text-white">Chloe的娛樂天地</span>
+</div>
+<p class="text-slate-400 text-sm max-w-sm mb-4">
+                        致力於為玩家提供最優質的網頁小遊戲體驗。無需安裝，隨點隨玩，讓快樂觸手可及。
+                    </p>
+<div class="flex gap-4">
+<a class="text-slate-400 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-slate-400 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="text-slate-400 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined">forum</span></a>
+</div>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">遊戲分類</h4>
+<ul class="space-y-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">動作冒險</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">益智解謎</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">經典街機</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">多人連線</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold mb-4">支援與幫助</h4>
+<ul class="space-y-2 text-sm text-slate-400">
+<li><a class="hover:text-primary transition-colors" href="#">關於我們</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">隱私權政策</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">使用者條款</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">聯絡開發者</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-slate-700 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+<p>© 2023 Chloe的娛樂天地. All rights reserved.</p>
+<p class="mt-2 md:mt-0">Designed &amp; Developed by Chloe</p>
+</div>
+</div>
+</footer>
+
+<script>
+    // Theme toggle functionality for dark/light mode
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.querySelector('button[title="切換至淺色模式"]');
+        const htmlElement = document.documentElement;
+        
+        // Check for saved theme preference or prefers-color-scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Set initial theme - default is dark (as per HTML class)
+        if (savedTheme === 'light') {
+            htmlElement.classList.remove('dark');
+        } else if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            htmlElement.classList.add('dark');
+        }
+        
+        // Update button state based on current theme
+        function updateButtonState() {
+            if (!themeToggle) return;
+            
+            const isDark = htmlElement.classList.contains('dark');
+            const icon = themeToggle.querySelector('span.material-symbols-outlined');
+            
+            if (isDark) {
+                // Dark mode is active - show light mode icon
+                themeToggle.title = "切換至淺色模式";
+                if (icon) icon.textContent = 'light_mode';
+                themeToggle.classList.remove('text-yellow-400', 'border-yellow-400/50');
+                themeToggle.classList.add('text-slate-300', 'border-slate-700');
+            } else {
+                // Light mode is active - show dark mode icon
+                themeToggle.title = "切換至深色模式";
+                if (icon) icon.textContent = 'dark_mode';
+                themeToggle.classList.remove('text-slate-300', 'border-slate-700');
+                themeToggle.classList.add('text-yellow-400', 'border-yellow-400/50');
+            }
+        }
+        
+        // Toggle theme function
+        function toggleTheme() {
+            const isDark = htmlElement.classList.contains('dark');
+            
+            if (isDark) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            
+            updateButtonState();
+        }
+        
+        // Add click event to theme toggle button
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
+            updateButtonState(); // Initial button state
+        }
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    htmlElement.classList.add('dark');
+                } else {
+                    htmlElement.classList.remove('dark');
+                }
+                updateButtonState();
+            }
+        });
+    });
+</script>
+
+</body></html>

@@ -177,6 +177,34 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Back button styling */
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--gradient-secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background: var(--gradient-primary);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
